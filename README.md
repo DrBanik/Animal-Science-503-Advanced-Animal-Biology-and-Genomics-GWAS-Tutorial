@@ -204,11 +204,19 @@ plink \
     --out plink_results_hwinb
 ```
 
-### So you fell for this again eh? 🫣
+If you got an error, click below
+
+<details>
+<summary><strong>Click here if you got an error</strong></summary>
+
+<br> 
+
+So you fell for this again eh? 🫣
+</details>
 
 You might want to think through the error first, before  
 <details>
-<summary><strong>Do you want tr reveal the correct code? 😏</strong></summary>
+<summary><strong>Do you want to reveal the correct code? 😏</strong></summary>
 
 <br> 
 
