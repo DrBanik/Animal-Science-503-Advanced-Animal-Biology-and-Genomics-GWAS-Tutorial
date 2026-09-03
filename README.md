@@ -936,5 +936,5 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 
 ## The End!
 <p align="center">
-  <img src="celebrate.gif" width="1000" alt="Tutorial Overview" />
+  <img src="images/celebrate.gif" width="1000" alt="Tutorial Overview" />
 </p>
