@@ -220,7 +220,7 @@ You might want to think through the error first, before peeking below 🧑‍�
 
 <br> 
 
-OK, enough teasing, here is the correct code. 🫩
+OK, enough teasing, here is the correct code. Just add --cow. 🫩
 
 ```bash
 plink \
