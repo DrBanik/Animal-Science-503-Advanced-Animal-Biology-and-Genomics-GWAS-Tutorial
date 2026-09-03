@@ -935,4 +935,4 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 - If an R script stops with an error, read the first error message before rerunning the script. Later errors may simply be consequences of the first one.
 
 ## The End!
-![Alt text description](https://tenor.com/view/confetti-gif-27343800)
+![GWAS Pipeline Demo](celebrate.gif)
