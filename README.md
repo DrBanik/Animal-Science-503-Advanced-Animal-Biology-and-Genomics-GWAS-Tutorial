@@ -32,7 +32,7 @@ ls                # ls means list content
 
 <br> 
 
-Below is a list of useful commands 
+Below is a list of useful commands 😏
 
 ```bash
 # --- Navigation & Path Inspection ---
@@ -144,14 +144,14 @@ plink \
     --out srd_qc
 ```
 
-### Oops! What happened?
+### Oops! What happened? 🤭
 
 What error message are you getting and why? Read the error message carefully.
 
 **Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
 
 <details>
-<summary><strong>Click to reveal the solution</strong></summary>
+<summary><strong>Click to reveal the solution 🤫</strong></summary>
 
 <br>
 
@@ -178,7 +178,7 @@ plink \
     --out srd_qc
 ```
 
-After adding `--cow`, PLINK recognizes the bovine chromosome set and the QC analysis can proceed.
+After adding `--cow`, PLINK recognizes the bovine chromosome set and the QC analysis can proceed. 😮‍💨
 
 </details>
 
@@ -199,11 +199,30 @@ First, calculate HWE statistics from the QC-filtered dataset.
 
 ```bash
 plink \
+    --bfile srd_qc \
+    --hardy \
+    --out plink_results_hwinb
+```
+
+### So you fell for this again eh? 🫣
+
+You might want to think through the error first, before  
+<details>
+<summary><strong>Do you want tr reveal the correct code? 😏</strong></summary>
+
+<br> 
+
+OK, enough teasing, here is the correct code. 🫩
+
+```bash
+plink \
     --cow \
     --bfile srd_qc \
     --hardy \
     --out plink_results_hwinb
 ```
+</details>
+
 
 The HWE results are written to:
 
