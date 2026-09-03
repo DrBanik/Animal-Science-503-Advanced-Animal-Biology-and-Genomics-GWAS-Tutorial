@@ -30,8 +30,9 @@ ls                # ls means list content
 <details>
 <summary><strong>Click to view some useful bash commands</strong></summary>
 
-<br>
-Below is a list of useful commands
+<br> 
+Below is a list of useful commands 
+
 ```bash
 # --- Navigation & Path Inspection ---
 pwd                                 # Print the absolute path of the current working directory
@@ -91,6 +92,7 @@ kill 12345                          # Terminate the process with Process ID (PID
 history                             # Display a numbered list of previously executed commands
 clear                               # Clear terminal window output (shortcut: Ctrl + L)
 ```
+
 </details>
 
 The main genotype input used in this tutorial is:
