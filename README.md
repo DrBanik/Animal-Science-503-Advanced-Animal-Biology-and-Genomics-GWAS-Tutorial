@@ -14,7 +14,7 @@ This tutorial walks through the bovine GWAS workflow used for the workshop. Run 
 
 
 To login, use the following command in your terminal:
-**_replace xx with your student number for example, student30 student 01.... etc_**
+**_replace xx with your student number for example; student30, student01, .... etc_**
 
 ```bash
 ssh -X -p 2222 studentXX@10.104.58.24
