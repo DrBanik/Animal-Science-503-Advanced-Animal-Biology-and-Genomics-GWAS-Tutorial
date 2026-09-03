@@ -214,7 +214,7 @@ If you got an error, click below
 So you fell for this again eh? 🫣
 </details>
 
-You might want to think through the error first, before  
+You might want to think through the error first, before peeking below 🧑‍💻🧠
 <details>
 <summary><strong>Do you want to reveal the correct code? 😏</strong></summary>
 
