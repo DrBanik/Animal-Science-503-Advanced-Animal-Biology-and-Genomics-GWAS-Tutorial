@@ -933,3 +933,6 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 - Do not delete intermediate files until the workflow is complete; later steps depend on several of them.
 - When using `nano`, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
 - If an R script stops with an error, read the first error message before rerunning the script. Later errors may simply be consequences of the first one.
+
+## The End!
+![Alt text description](https://tenor.com/view/confetti-gif-27343800)
