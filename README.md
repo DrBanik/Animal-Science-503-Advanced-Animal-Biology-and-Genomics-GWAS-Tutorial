@@ -141,7 +141,7 @@ plink \
     --out srd_qc
 ```
 
-### Oops! happened?
+### Oops! What happened?
 
 What error message are you getting and why? Read the error message carefully.
 
