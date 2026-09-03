@@ -556,9 +556,8 @@ write.table(covar_df, "covariates.txt", row.names = FALSE, col.names = TRUE, quo
 ```
 
 If you used an interactive R session instead of `Rscript`, exit without saving the workspace:
-
 ```r
-q("no")
+q("no")    # You can also use Ctrl + d and when prompted to save workplace, type n.
 ```
 
 ### Main outputs
