@@ -36,7 +36,42 @@ The metadata file used later is:
 
 ## 1. Initial Quality Control: Call Rate and MAF
 
-This step applies the initial SNP and animal-level QC filters and creates a binary PLINK dataset for downstream analyses.
+This step applies the initial SNP- and animal-level QC filters and creates a binary PLINK dataset for downstream analyses.
+
+Run the following command:
+
+```bash
+plink \
+    --file /workshop/data/SRD_HFL_AI_50K \
+    --allow-no-sex \
+    --maf 0.05 \
+    --geno 0.10 \
+    --mind 0.10 \
+    --memory 4000 \
+    --make-bed \
+    --out srd_qc
+```
+
+### What happened?
+
+The command should return an error. Read the error message carefully.
+
+**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
+
+<details>
+<summary><strong>Click to reveal the solution</strong></summary>
+
+<br>
+
+By default, PLINK assumes that the dataset is **human**. Human autosomes are numbered 1–22, while cattle have **29 autosomes**.
+
+We therefore need to tell PLINK that we are working with cattle by adding:
+
+```bash
+--cow
+```
+
+The corrected command is:
 
 ```bash
 plink \
@@ -50,6 +85,10 @@ plink \
     --make-bed \
     --out srd_qc
 ```
+
+After adding `--cow`, PLINK recognizes the bovine chromosome set and the QC analysis can proceed.
+
+</details>
 
 ### Main output
 
