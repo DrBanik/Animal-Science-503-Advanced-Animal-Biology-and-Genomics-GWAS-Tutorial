@@ -12,11 +12,19 @@ This tutorial walks through the bovine GWAS workflow used for the workshop. Run 
 6. Association testing across six covariate models under additive, dominant, and recessive inheritance modes.
 7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
 
-> **Working directory:** Before starting, make sure you are in your own workshop directory.
+
+To login, use the following command in your terminal:
+**_replace xx with your student number for example, student30 student 01.... etc_**
 
 ```bash
-cd ~/workshop
-pwd
+ssh -X -p 2222 studentXX@10.104.58.24
+```
+
+> **Working directory:** Before starting, make sure you are in your own workshop directory.
+```bash
+cd ~/workshop     # cd means change directory
+pwd               # pwd means print working directoy
+ls                # ls means list content
 ```
 
 The main genotype input used in this tutorial is:
@@ -44,6 +52,13 @@ First, check the version and help details for plink.
 plink --version
 plink --help
 ```
+
+If the help output is too long, pipe the output to less, so you can scroll pages using the space bar, and use g/G to go to the first/Last page respectively. Use q to exit when you have finished viewing the file.
+
+```bash
+plink --help | less
+```
+
 Now that you have verified the version and viewed the help menu,
 
 Run the following command:
