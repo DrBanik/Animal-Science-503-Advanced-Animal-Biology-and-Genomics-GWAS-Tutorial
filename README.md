@@ -27,6 +27,72 @@ pwd               # pwd means print working directoy
 ls                # ls means list content
 ```
 
+<details>
+<summary><strong>Click to view some useful bash commands</strong></summary>
+
+<br>
+
+```bash
+# --- Navigation & Path Inspection ---
+pwd                                 # Print the absolute path of the current working directory
+cd my_folder                        # Change directory into 'my_folder'
+cd ..                               # Move up one directory level (parent directory)
+cd ~                                # Jump directly to your user's home directory
+cd -                                # Switch back to the previous directory you were in
+
+# --- Listing Files & Folders ---
+ls                                  # List names of files and folders in the current directory
+ls -l                               # Detailed list view showing permissions, owner, file size, and modification date
+ls -lh                              # Detailed list view with human-readable file sizes (K, M, G)
+ls -la                              # List all files, including hidden files and dotfiles (names starting with .)
+ls -lt                              # List files sorted by last modified time (newest first)
+
+# --- Viewing File Content ---
+cat file.txt                        # Print the entire contents of file.txt to the terminal
+less file.txt                       # Open a scrollable, paginated viewer (press 'q' to quit, '/' to search)
+head file.txt                       # Display the first 10 lines of file.txt
+head -n 25 file.txt                 # Display the first 25 lines of file.txt
+tail file.txt                       # Display the last 10 lines of file.txt
+tail -n 20 file.txt                 # Display the last 20 lines of file.txt
+tail -f process.log                 # Follow file updates in real-time as new lines are appended
+
+# --- File & Directory Management ---
+mkdir new_folder                    # Create a new directory named 'new_folder'
+mkdir -p path/to/nested/folder      # Create nested parent directories automatically without error
+touch new_file.txt                  # Create an empty file or update the timestamp of an existing file
+cp source.txt backup.txt            # Copy 'source.txt' to a new file called 'backup.txt'
+cp -r folder_a folder_backup        # Recursively copy an entire folder and its contents
+mv old_name.txt new_name.txt        # Rename a file or directory
+mv file.txt /path/to/destination/   # Move a file to another location
+rm unwanted_file.txt                # Permanently delete a file (no trash bin, cannot undo)
+rm -r unwanted_folder               # Recursively delete a directory and all files inside it
+
+# --- Searching & Inspection ---
+wc -l file.txt                      # Count the total number of lines in file.txt
+grep "pattern" file.txt             # Search and print lines containing 'pattern' in file.txt
+grep -i "pattern" file.txt          # Case-insensitive search for 'pattern' in file.txt
+grep -c "pattern" file.txt          # Count the number of lines matching 'pattern' in file.txt
+find . -name "*.bed"                # Search the current directory recursively for files ending with .bed
+which plink                         # Locate the executable path of a program in your system's PATH
+
+# --- Pipes & Redirection ---
+command > output.txt                # Run command and write its output to a file, overwriting existing content
+command >> output.txt               # Run command and append its output to the end of a file
+command1 | command2                 # Pipe: pass the stdout output of command1 directly into command2 as input
+cat file.txt | grep "Chr1" | wc -l  # Count how many lines in file.txt contain "Chr1"
+
+# --- System, Memory & Process Monitoring ---
+df -h                               # Show available and used disk space across mounted filesystems
+du -sh folder_name                  # Show the total disk space consumed by folder_name
+free -h                             # Show total, used, and available system RAM memory
+top                                 # Open an interactive monitor of CPU and RAM usage by running processes
+htop                                # An enhanced, color-coded interactive process monitor (if installed)
+kill 12345                          # Terminate the process with Process ID (PID) 12345
+history                             # Display a numbered list of previously executed commands
+clear                               # Clear terminal window output (shortcut: Ctrl + L)
+```
+</details>
+
 The main genotype input used in this tutorial is:
 
 ```text
