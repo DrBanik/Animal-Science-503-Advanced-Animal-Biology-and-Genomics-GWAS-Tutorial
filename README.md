@@ -38,6 +38,14 @@ The metadata file used later is:
 
 This step applies the initial SNP- and animal-level QC filters and creates a binary PLINK dataset for downstream analyses.
 
+First, check the version and help details for plink.
+
+```bash
+plink --version
+plink --help
+```
+Now that you have verified the version and viewed the help menu,
+
 Run the following command:
 
 ```bash
@@ -52,9 +60,9 @@ plink \
     --out srd_qc
 ```
 
-### What happened?
+### Oops! happened?
 
-The command should return an error. Read the error message carefully.
+What error message are you getting and why? Read the error message carefully.
 
 **Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
 
@@ -232,6 +240,8 @@ The plot is saved as:
 ```text
 hwe_distribution_plots.png
 ```
+
+Based ion the plot, what threshold should be used for HWE?
 
 ### Apply the HWE filter
 
