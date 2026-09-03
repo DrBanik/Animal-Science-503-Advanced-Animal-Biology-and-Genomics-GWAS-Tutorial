@@ -211,7 +211,8 @@ If you got an error, click below
 
 <br> 
 
-So you fell for this again eh? 🫣
+So you fell for this again eh? 🫣  
+
 You might want to think through the error first, before peeking below 🧑‍💻🧠
 </details>
 
