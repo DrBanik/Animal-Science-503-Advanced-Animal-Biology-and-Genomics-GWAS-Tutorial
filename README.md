@@ -325,7 +325,7 @@ The plot is saved as:
 hwe_distribution_plots.png
 ```
 
-Based ion the plot, what threshold should be used for HWE?
+Based on the plot, what threshold should be used for HWE?
 
 ### Apply the HWE filter
 
