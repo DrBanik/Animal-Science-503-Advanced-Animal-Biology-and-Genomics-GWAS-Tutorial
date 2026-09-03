@@ -1,6 +1,6 @@
 # Hands-on Tutorial: Quality Control, Population Structure, and Multi-Model GWAS
 
-This notebook-style tutorial walks through the bovine GWAS workflow used for the workshop. Run the commands in order and keep all generated output files in your own `~/workshop` directory unless otherwise stated.
+This tutorial walks through the bovine GWAS workflow used for the workshop. Run the commands in order and keep all generated output files in your own `~/workshop` directory unless otherwise stated.
 
 ## Workflow overview
 
