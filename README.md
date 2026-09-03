@@ -31,7 +31,7 @@ ls                # ls means list content
 <summary><strong>Click to view some useful bash commands</strong></summary>
 
 <br>
-
+Below is a list of useful commands
 ```bash
 # --- Navigation & Path Inspection ---
 pwd                                 # Print the absolute path of the current working directory
