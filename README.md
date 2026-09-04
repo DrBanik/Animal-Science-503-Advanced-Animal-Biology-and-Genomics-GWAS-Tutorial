@@ -634,10 +634,9 @@ Wait, why did it work 😲? Something looks different here, what is it? 🤔
 <details>
 <summary><strong>Clue 🤔🧐</strong></summary>
 
-[https://github.com/user-attachments/assets/your-video-id.mp4](https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182)
+<video src="https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182" controls width="100%"></video>
 
 </details>
-
 
 ### Main output
 
