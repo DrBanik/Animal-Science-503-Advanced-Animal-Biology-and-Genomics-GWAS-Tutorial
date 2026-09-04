@@ -154,10 +154,13 @@ What error message are you getting and why? Read the error message carefully.
 <details>
 <summary><strong>Clue 🤔🧐</strong></summary>  
     
+<details>
+<summary><strong>Clue 🤔🧐</strong></summary>  
+    
 <p align="left">
   <img src="images/holstein.jpg" width="300" alt="Tutorial Overview" />
   <br>
-  <sub><i>Source: <a href="https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/">https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/</a></i></sub>
+  <sub><i>Source: <a href="https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/">AGDAILY</a></i></sub>
 </p>
 
 </details>
@@ -637,7 +640,7 @@ Wait, why did it work 😲? Something looks different here, what is it? 🤔
 
 <video src="https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182" controls width="100%"></video>
 
-<sub><i>Source: <a href="https://www.tiktok.com/t/ZTUFuSbBq">https://www.tiktok.com/t/ZTUFuSbBq</a></i></sub>
+<sub><i>Source: <a href="https://www.tiktok.com/t/ZTUFuSbBq">TikTok</a></i></sub>
 
 </details>
 
