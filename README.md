@@ -936,7 +936,7 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 - When using `nano`, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
 - If an R script stops with an error, read the first error message before rerunning the script. Later errors may simply be consequences of the first one.
 
-## The End!
+## The End! :grin:
 <p align="center">
   <img src="images/celebrate.gif" width="1000" alt="Tutorial Overview" />
 </p>
