@@ -153,9 +153,8 @@ What error message are you getting and why? Read the error message carefully.
 <details>
 <summary><strong>Clue 🤔🧐</strong></summary>
 <p align="left">
-  <img src="images/holstein.jpg" width="200" alt="Tutorial Overview" />
+  <img src="images/holstein.jpg" width="300" alt="Tutorial Overview" />
 </p>
-
 <br>
 
 </details>
