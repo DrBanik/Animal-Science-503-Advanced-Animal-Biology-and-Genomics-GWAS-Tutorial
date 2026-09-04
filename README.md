@@ -630,15 +630,14 @@ plink \
 ```
 
 Wait, why did it work 😲? Something looks different here, what is it? 🤔
-<details>
-<summary><strong>Clue 🤔🧐</strong></summary>  
-    
-<video width="100%" controls>
-  <source src="images/cow_mooing.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
-<br>
+<details>
+<summary><strong>Clue 🤔🧐</strong></summary>
+
+<video width="100%" controls>
+  <source src="images/cow_mooing.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 </details>
 
