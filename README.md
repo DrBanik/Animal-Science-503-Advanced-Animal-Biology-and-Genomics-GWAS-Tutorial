@@ -1,7 +1,7 @@
 # Hands-on Tutorial: Quality Control, Population Structure, and Multi-Model GWAS
 
 This tutorial walks through the bovine GWAS workflow used for the workshop. Run the commands in order and keep all generated output files in your own `~/workshop` directory unless otherwise stated.  
-_For shorter commands, it is better to type out each command manually rather than copying directly. This helps you get accustomed to the bash and R environments._
+<small>_For shorter commands, it is better to type out each command manually rather than copying directly. This helps you get accustomed to the bash and R environments._</small>
 
 ## Workflow overview
 
