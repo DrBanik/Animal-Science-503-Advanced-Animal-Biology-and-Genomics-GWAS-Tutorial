@@ -151,6 +151,15 @@ What error message are you getting and why? Read the error message carefully.
 **Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
 
 <details>
+<summary><strong>Clue 🤔🧐</strong></summary>
+
+
+<br>
+
+</details>
+
+
+<details>
 <summary><strong>Click to reveal the solution 🤫</strong></summary>
 
 <br>
