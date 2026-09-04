@@ -156,8 +156,9 @@ What error message are you getting and why? Read the error message carefully.
     
 <p align="left">
   <img src="images/holstein.jpg" width="300" alt="Tutorial Overview" />
+  <br>
+  <sub><i>Source: <a href="https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/">https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/</a></i></sub>
 </p>
-<br>
 
 </details>
 
@@ -962,4 +963,6 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 ## The End! :grin: :clap:
 <p align="center">
   <img src="images/celebrate.gif" width="1000" alt="Tutorial Overview" />
+  <br>
+  <sub><i>Source: <a href="https://www.pinterest.com/pin/55239532918424769/">Pinterest</a></i></sub>
 </p>
