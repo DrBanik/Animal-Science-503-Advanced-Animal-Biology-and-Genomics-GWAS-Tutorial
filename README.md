@@ -148,10 +148,12 @@ plink \
 
 What error message are you getting and why? Read the error message carefully.
 
-**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
+**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?  
+
 
 <details>
-<summary><strong>Clue 🤔🧐</strong></summary>
+<summary><strong>Clue 🤔🧐</strong></summary>  
+    
 <p align="left">
   <img src="images/holstein.jpg" width="300" alt="Tutorial Overview" />
 </p>
