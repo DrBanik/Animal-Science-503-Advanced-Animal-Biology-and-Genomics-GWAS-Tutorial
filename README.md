@@ -928,7 +928,7 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 | GWAS models | Bash `for` loop | `.assoc.logistic` files |
 | Manhattan/Q-Q plots | `Rscript gwas_plots.R` | `.png` plots |
 
-## Notes for students
+## Notes for students ✍️📖
 
 - Run commands from your own `~/workshop` directory so your output files stay separate from other students' work.
 - Read the PLINK `.log` file after every major PLINK command. It records how many animals and SNPs were loaded, removed, and retained.
@@ -936,7 +936,7 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 - When using `nano`, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
 - If an R script stops with an error, read the first error message before rerunning the script. Later errors may simply be consequences of the first one.
 
-## The End! :grin:
+## The End! :grin: :clap:
 <p align="center">
   <img src="images/celebrate.gif" width="1000" alt="Tutorial Overview" />
 </p>
