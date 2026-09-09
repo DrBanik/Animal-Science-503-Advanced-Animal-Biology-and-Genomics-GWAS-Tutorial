@@ -13,250 +13,354 @@ This tutorial walks through the bovine GWAS workflow used for the workshop. Run 
 7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
 
 
-Computer Setup and Server Login
+## 💻 Computer Setup and Server Login
 
-Please complete the setup below before the workshop.
+Please complete the setup below **before the workshop**.
 
-Your assigned username will be student01, student02, etc. Replace studentXX in all commands below with your assigned student number.
+Your assigned username will be `student01`, `student02`, etc. Replace `studentXX` in all commands below with your assigned student number.
 
 For example:
 
+```bash
 ssh -Y student01@10.104.58.24
+```
 
-Important: You must be connected to the WSU network or WSU VPN to access the workshop server.
+> ⚠️ **Important:** You must be connected to the **WSU network or WSU VPN** to access the workshop server.
 
-Windows Users
-1. Update PowerShell
+---
 
-Please make sure that you have a current version of PowerShell installed.
+### 🪟 Windows Users
+
+#### 1. Update PowerShell
+
+Please make sure that you have an updated version of PowerShell installed.
 
 You can check your version by opening PowerShell and running:
 
+```powershell
 $PSVersionTable.PSVersion
-2. Install or Update Windows Subsystem for Linux (WSL)
+```
 
-Open PowerShell as Administrator.
+If needed, download/update PowerShell here:
+
+👉 https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
+
+---
+
+#### 2. Install or Update Windows Subsystem for Linux (WSL)
+
+Open **PowerShell as Administrator**.
 
 If WSL is not already installed, run:
 
+```powershell
 wsl --install
+```
 
 This installs WSL and Ubuntu by default.
 
 If WSL is already installed, update it:
 
+```powershell
 wsl --update
+```
 
 You can check the installation with:
 
+```powershell
 wsl --version
+```
 
 and:
 
+```powershell
 wsl --list --verbose
+```
 
 Restart your computer if Windows asks you to do so.
 
-3. Start Ubuntu and Create Your Linux User
+---
 
-Open Ubuntu from the Start menu.
+#### 3. Start Ubuntu and Create Your Linux User
+
+Open **Ubuntu** from the Start menu.
 
 The first time Ubuntu starts, it will ask you to create a Linux username and password.
 
-This username is for your own computer and does not need to match your workshop studentXX username.
+> 💡 This username is for your **own computer** and does not need to match your workshop `studentXX` username.
 
 Once Ubuntu opens, update the installed packages:
 
+```bash
 sudo apt update
 sudo apt upgrade -y
+```
 
 Install the utilities needed for the workshop and X11 authentication:
 
+```bash
 sudo apt install -y xauth x11-apps openssh-client
-4. Update WSLg
+```
 
-From Windows PowerShell, not from inside Ubuntu, run:
+---
 
+#### 4. Update WSLg
+
+From **Windows PowerShell**, not from inside Ubuntu, run:
+
+```powershell
 wsl --update
+```
 
 Then restart WSL:
 
+```powershell
 wsl --shutdown
+```
 
 Open Ubuntu again.
 
-WSLg provides graphical Linux application support, so Windows users using current WSL generally do not need to install Xming or VcXsrv separately.
+WSLg provides graphical Linux application support, so Windows users using current WSL generally do **not** need to install Xming or VcXsrv separately.
 
 You can test graphical support from Ubuntu with:
 
+```bash
 xclock
+```
 
-A small clock window should appear.
+A small clock window should appear. 🕐
 
-5. Connect to the Workshop Server
+---
+
+#### 5. Connect to the Workshop Server
 
 From the Ubuntu/WSL terminal:
 
+```bash
 ssh -Y studentXX@10.104.58.24
+```
 
 For example:
 
+```bash
 ssh -Y student01@10.104.58.24
+```
 
 Enter your assigned workshop password when prompted.
 
 After connecting, you should see a prompt similar to:
 
+```text
 student01@gwaa-workshop:~$
+```
 
 You can confirm that you are in the correct environment with:
 
+```bash
 hostname
 whoami
 pwd
+```
 
-For student01, for example, you should see:
+For `student01`, for example, you should see:
 
+```text
 gwaa-workshop
 student01
 /home/student01
+```
 
 To test X11 forwarding after connecting:
 
+```bash
 xclock
+```
 
-A clock window should appear on your Windows desktop.
+A clock window should appear on your Windows desktop. ✅
 
-macOS Users
+---
 
-macOS already includes an SSH client, so WSL and PuTTY are not required.
+### 🖥️ PuTTY — Optional for Windows Users
 
-1. Install XQuartz
+Windows users who prefer a graphical SSH client may also install **PuTTY**.
+
+Download PuTTY here:
+
+👉 https://www.putty.org/
+
+Configure the connection as:
+
+```text
+Host Name: 10.104.58.24
+Port:      22
+Protocol:  SSH
+```
+
+When prompted for a username, enter your assigned `studentXX` username.
+
+> ℹ️ **Note:** PuTTY is convenient for normal terminal access, but PuTTY alone does not provide an X server. If you need graphical/X11 applications, using **Ubuntu through WSL/WSLg** is encouraged.
+
+For X11 from WSL/Ubuntu, use:
+
+```bash
+ssh -Y studentXX@10.104.58.24
+```
+
+---
+
+### 🍎 macOS Users
+
+macOS already includes an SSH client, so WSL and PuTTY are **not required**.
+
+#### 1. Install XQuartz
 
 macOS requires an X11 server for displaying graphical applications forwarded from the workshop server.
 
-Download and install XQuartz:
+Download and install **XQuartz** here:
 
-https://www.xquartz.org/
+👉 https://www.xquartz.org/
 
-After installing XQuartz, log out of macOS and log back in (or restart the computer).
+After installing XQuartz, **log out of macOS and log back in** or restart the computer.
 
 Open XQuartz before testing X11 forwarding.
 
-2. Connect Using Terminal
+If you already use Homebrew, you can also install XQuartz from the command line:
 
-Open the macOS Terminal application and connect with:
+```bash
+brew install --cask xquartz
+```
 
+After installation, log out and log back in before testing X11 forwarding.
+
+---
+
+#### 2. Connect Using Terminal
+
+Open the macOS **Terminal** application and connect with:
+
+```bash
 ssh -Y studentXX@10.104.58.24
+```
 
 For example:
 
+```bash
 ssh -Y student01@10.104.58.24
+```
 
 Enter your assigned workshop password.
 
 You should arrive at:
 
+```text
 student01@gwaa-workshop:~$
+```
 
 Test the connection:
 
+```bash
 hostname
 whoami
 pwd
+```
 
 Then test graphical/X11 forwarding:
 
+```bash
 xclock
+```
 
-The clock should appear through XQuartz.
+The clock should appear through XQuartz. 🕐✅
 
-Optional: Install XQuartz from the Command Line
+---
 
-If you already use Homebrew, XQuartz can also be installed with:
+### 📂 File Transfer — Windows and macOS
 
-brew install --cask xquartz
+Windows and macOS users are encouraged to download **FileZilla Client** for transferring files between your computer and the workshop server.
 
-After installation, log out and log back in before testing X11 forwarding.
+Download FileZilla here:
 
-File Transfer — Windows and macOS
-
-We recommend FileZilla Client for transferring files between your computer and the workshop server.
-
-Download FileZilla Client:
-
-https://filezilla-project.org/
+👉 https://filezilla-project.org/
 
 In FileZilla, use:
 
+```text
 Protocol: SFTP - SSH File Transfer Protocol
 Host:     10.104.58.24
 Port:     22
 Username: studentXX
 Password: Your assigned workshop password
+```
 
-For example, student01 would use:
+For example, `student01` would use:
 
+```text
 Host:     10.104.58.24
 Port:     22
 Username: student01
+```
 
 Your personal workshop directory is:
 
+```text
 /workshop/students/studentXX
+```
 
 For example:
 
+```text
 /workshop/students/student01
+```
 
 Your Linux home directory is:
 
+```text
 /home/studentXX
-PuTTY — Optional for Windows Users
+```
 
-Windows users who prefer a graphical SSH client may also install PuTTY.
+> 💡 In FileZilla, make sure the **local folder on your computer is writable** (for example, your Downloads folder) before downloading files.
 
-Download PuTTY from the official PuTTY website.
+---
 
-Configure the connection as:
+### 🚀 Quick Reference
 
-Host Name: 10.104.58.24
-Port:      22
-Protocol:  SSH
+**Windows — recommended login with X11 support:**
 
-When prompted for a username, enter your assigned studentXX username.
-
-Note: PuTTY is convenient for normal terminal access, but PuTTY alone does not provide an X server. For graphical/X11 applications, Windows users are encouraged to use Ubuntu through WSL/WSLg and connect with:
-
-ssh -Y studentXX@10.104.58.24
-Quick Reference
-
-Windows — recommended login with X11 support:
-
+```bash
 # Run from Ubuntu/WSL
 ssh -Y studentXX@10.104.58.24
+```
 
-macOS — recommended login with XQuartz installed:
+**macOS — recommended login with XQuartz installed:**
 
+```bash
 ssh -Y studentXX@10.104.58.24
+```
 
-Command-line login without graphical forwarding:
+**Command-line login without graphical forwarding:**
 
+```bash
 ssh studentXX@10.104.58.24
+```
 
-FileZilla/SFTP:
+**FileZilla/SFTP:**
 
+```text
 Host:     10.104.58.24
 Port:     22
 Protocol: SFTP
 Username: studentXX
+```
 
-Your personal workshop directory:
+**Your personal workshop directory:**
 
+```text
 /workshop/students/studentXX
+```
 
-Please verify that you can log in to the server, transfer a file using FileZilla, and open xclock using X11 forwarding before the workshop.
+✅ Please verify that you can **log in to the server, transfer a file using FileZilla, and open `xclock` using X11 forwarding before the workshop.**
 
+---
 
 > **Working directory:** Before starting, make sure you are in your own workshop directory.
 ```bash
