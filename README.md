@@ -740,6 +740,18 @@ The plot is saved as:
 hwe_distribution_plots.png
 ```
 
+To view the plot, use:
+
+```bash
+feh hwe_distribution_plots.png
+```
+If the image is too large, play around with the --zoom flag to fit your desired viewing %. Here, we use 50:
+
+```bash
+feh --zoom 50 hwe_distribution_plots.png
+```
+> 💡 If you have troubles viewing the plot, you can download the plot using scp or filezilla.
+
 Based on the plot, what threshold should be used for HWE?
 
 ### Apply the HWE filter
