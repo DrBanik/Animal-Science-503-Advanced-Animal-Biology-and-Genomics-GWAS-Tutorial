@@ -276,7 +276,37 @@ The clock should appear through XQuartz. 🕐✅
 
 ### 📂 File Transfer — Windows and macOS
 
-Windows and macOS users are encouraged to download **FileZilla Client** for transferring files between your computer and the workshop server.
+The simplest way to transfer files is to use `scp` directly from the terminal on your local computer.
+
+To download a **single file** from the workshop server:
+
+```bash
+scp studentXX@10.104.58.24:/path/to/file .
+```
+To download a whole directory, add -r:  
+
+```bash
+scp -r studentXX@10.104.58.24:/path/to/directory .
+```
+The . at the end means download the file or directory to your current local directory.
+
+For example:
+
+```bash
+scp student01@10.104.58.24:/workshop/students/student01/results.txt .
+```
+or for a whole directory:  
+
+```bash
+scp -r student01@10.104.58.24:/workshop/students/student01/results .
+```
+💡 You can check your current local directory before downloading with:
+
+```bash
+pwd
+```
+
+Otherwise, Windows and macOS users are encouraged to download FileZilla Client for an easier graphical way to transfer files between your computer and the workshop server.
 
 Download FileZilla here:
 
