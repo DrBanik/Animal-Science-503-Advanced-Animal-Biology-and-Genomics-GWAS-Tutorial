@@ -87,7 +87,7 @@ Open **Ubuntu** from the Start menu.
 
 The first time Ubuntu starts, it will ask you to create a Linux username and password.
 
-> 💡 This username is for your **own computer** and does not need to match your workshop `studentXX` username.
+> 💡 This username is for your **own computer** and does not need to match your workshop `studentXX` username. Make sure you save the username and password in a secure folder.
 
 Once Ubuntu opens, update the installed packages:
 
@@ -128,7 +128,7 @@ You can test graphical support from Ubuntu with:
 xclock
 ```
 
-A small clock window should appear. 🕐
+A small clock window should appear. 🕐  
 
 ---
 
