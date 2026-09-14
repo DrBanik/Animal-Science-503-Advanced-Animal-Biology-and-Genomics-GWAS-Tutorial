@@ -767,7 +767,7 @@ After reviewing the HWE distribution, apply the selected threshold:
 plink \
     --cow \
     --bfile srd_qc \
-    --hwe 1e-8 \
+    --hwe 3e-9 \
     --make-bed \
     --out srd_qc_hwe
 ```
