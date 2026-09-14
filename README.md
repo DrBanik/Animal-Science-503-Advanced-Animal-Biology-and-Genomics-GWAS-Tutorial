@@ -1080,6 +1080,41 @@ for cov in "unadjusted" "birth_year" "birth_year_group" "technician" "pc1_pc2" "
 done
 ```
 
+Or you can save it as a bash script first with:
+
+```bash
+nano association_all_models.sh
+```
+
+Then Paste:
+
+```bash
+#!/usr/bin/bash
+for cov in "unadjusted" "birth_year" "birth_year_group" "technician" "pc1_pc2" "sire"; do
+  cov_args=""
+  if [ "$cov" = "birth_year" ];       then cov_args="--covar covariates.txt --covar-name Birth_Year"; fi
+  if [ "$cov" = "birth_year_group" ]; then cov_args="--covar covariates.txt --covar-name Birth_Year_Group"; fi
+  if [ "$cov" = "technician" ];       then cov_args="--covar covariates.txt --covar-name Technician"; fi
+  if [ "$cov" = "pc1_pc2" ];          then cov_args="--covar covariates.txt --covar-name PC1,PC2"; fi
+  if [ "$cov" = "sire" ];             then cov_args="--covar covariates.txt --covar-name Sire"; fi
+
+  # 1. Additive Model
+  plink --bfile srd_qc_allchr --autosome-num 30 --allow-no-sex --logistic hide-covar $cov_args --out "gwas_${cov}_ADD"
+
+  # 2. Dominant Model
+  plink --bfile srd_qc_allchr --autosome-num 30 --allow-no-sex --logistic dominant hide-covar $cov_args --out "gwas_${cov}_DOM"
+
+  # 3. Recessive Model
+  plink --bfile srd_qc_allchr --autosome-num 30 --allow-no-sex --logistic recessive hide-covar $cov_args --out "gwas_${cov}_REC"
+done
+```
+
+Then, execute with
+
+```bash
+bash association_all_models.sh
+```
+
 This produces `.assoc.logistic` files for each covariate/inheritance-model combination.
 
 ---
