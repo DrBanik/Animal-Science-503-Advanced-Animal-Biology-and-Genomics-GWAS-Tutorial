@@ -666,13 +666,13 @@ if ("TEST" %in% colnames(hwe_raw)) {
 
 hwe_clean <- hwe_clean %>%
   filter(!is.na(P) & P >= 0 & P <= 1) %>%
-  mutate(log10_P = -log10(ifelse(P == 0, 1e-50, P)))
+  mutate(log10_P = -log10(ifelse(P == 0, 1e-100, P)))
 
-n_failed <- sum(hwe_clean$P < 1e-9)
+n_failed <- sum(hwe_clean$P < 1e-8)
 
 p_hwe_all <- ggplot(hwe_clean, aes(x = log10_P)) +
   geom_histogram(bins = 60, fill = "steelblue", color = "white", linewidth = 0.2) +
-  geom_vline(xintercept = -log10(1e-9), color = "red", linetype = "dashed", linewidth = 0.9) +
+  geom_vline(xintercept = -log10(1e-8), color = "red", linetype = "dashed", linewidth = 0.9) +
   scale_y_continuous(
     trans = "pseudo_log",
     breaks = c(1, 10, 100, 1000, 10000, 50000),
@@ -680,9 +680,9 @@ p_hwe_all <- ggplot(hwe_clean, aes(x = log10_P)) +
   ) +
   annotate(
     "text",
-    x = -log10(1e-9) + 0.8,
+    x = -log10(1e-8) + 0.8,
     y = 5000,
-    label = paste0("p < 1e-9 Filter\n(", n_failed, " SNPs removed)"),
+    label = paste0("p < 1e-8 Filter\n(", n_failed, " SNPs removed)"),
     color = "red",
     hjust = 0,
     fontface = "bold",
@@ -705,16 +705,16 @@ hwe_zoom_data <- hwe_clean %>% filter(log10_P >= 2)
 
 p_hwe_zoom <- ggplot(hwe_zoom_data, aes(x = log10_P)) +
   geom_histogram(binwidth = 0.5, fill = "darkorange", color = "white", linewidth = 0.2) +
-  geom_vline(xintercept = -log10(1e-9), color = "red", linetype = "dashed", linewidth = 0.9) +
+  geom_vline(xintercept = -log10(1e-8), color = "red", linetype = "dashed", linewidth = 0.9) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   annotate(
     "rect",
-    xmin = -log10(1e-9), xmax = Inf, ymin = 0, ymax = Inf,
+    xmin = -log10(1e-8), xmax = Inf, ymin = 0, ymax = Inf,
     fill = "red", alpha = 0.1
   ) +
   annotate(
     "text",
-    x = -log10(1e-9) + 0.5,
+    x = -log10(1e-8) + 0.5,
     y = max(table(cut_width(hwe_zoom_data$log10_P, 0.5))) * 0.85,
     label = "Excluded SNPs",
     color = "darkred",
