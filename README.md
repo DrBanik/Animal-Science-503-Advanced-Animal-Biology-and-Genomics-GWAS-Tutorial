@@ -672,7 +672,7 @@ n_failed <- sum(hwe_clean$P < 1e-9)
 
 p_hwe_all <- ggplot(hwe_clean, aes(x = log10_P)) +
   geom_histogram(bins = 60, fill = "steelblue", color = "white", linewidth = 0.2) +
-  geom_vline(xintercept = -log10(1e-8), color = "red", linetype = "dashed", linewidth = 0.9) +
+  geom_vline(xintercept = -log10(1e-9), color = "red", linetype = "dashed", linewidth = 0.9) +
   scale_y_continuous(
     trans = "pseudo_log",
     breaks = c(1, 10, 100, 1000, 10000, 50000),
