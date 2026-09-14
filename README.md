@@ -668,7 +668,7 @@ hwe_clean <- hwe_clean %>%
   filter(!is.na(P) & P >= 0 & P <= 1) %>%
   mutate(log10_P = -log10(ifelse(P == 0, 1e-50, P)))
 
-n_failed <- sum(hwe_clean$P < 1e-6)
+n_failed <- sum(hwe_clean$P < 1e-9)
 
 p_hwe_all <- ggplot(hwe_clean, aes(x = log10_P)) +
   geom_histogram(bins = 60, fill = "steelblue", color = "white", linewidth = 0.2) +
