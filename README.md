@@ -12,6 +12,10 @@ This tutorial walks through the bovine GWAS workflow used for the workshop. Run 
 6. Association testing across six covariate models under additive, dominant, and recessive inheritance modes.
 7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
 
+<details>
+<summary><strong>Click here to view computer setup and server login instructions 💻 🔧</strong></summary>
+
+<br>
 
 ## 💻 Computer Setup and Server Login
 
@@ -391,6 +395,7 @@ Username: studentXX
 ✅ Please verify that you can **log in to the server, transfer a file using FileZilla, and open `xclock` using X11 forwarding before the workshop.**
 
 ---
+</details>
 
 > **Working directory:** Before starting, make sure you are in your own workshop directory.
 ```bash
