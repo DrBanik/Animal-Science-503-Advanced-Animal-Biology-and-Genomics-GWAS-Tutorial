@@ -1,21 +1,20 @@
 # Hands-on Tutorial: Quality Control, Population Structure, and Multi-Model GWAS
 
 This tutorial walks through the bovine GWAS workflow used for the workshop. Run the commands in order and keep all generated output files in your own `~/workshop` directory unless otherwise stated.  
+
 <sub>*For shorter commands, it is better to type out each command manually rather than copying directly. This helps you get accustomed to the bash and R environments.*</sub>
+
 ## Workflow overview
 
 1. Quality control filtering on call rates and MAF.
-2. Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and zoomed-tail plots, followed by HWE filtering at `p < 1e-6`.
+2. Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and zoomed-tail plots, followed by HWE filtering.
 3. PCA calculation.
 4. Scree plot generation, metadata PCA plots, covariate testing, and covariate-file export.
 5. Whole-genome representation including chromosome X.
 6. Association testing across six covariate models under additive, dominant, and recessive inheritance modes.
 7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
 
-<details>
-<summary><strong>Click here to view computer setup and server login instructions 💻 🔧</strong></summary>
-
-<br>
+---
 
 ## 💻 Computer Setup and Server Login
 
@@ -32,6 +31,83 @@ ssh -Y student01@10.104.58.24
 > ⚠️ **Important:** You must be connected to the **WSU network or WSU VPN** to access the workshop server.
 
 ---
+
+## 🔐 Connect to the WSU VPN
+
+If you are **not connected to the WSU network**, connect to the WSU VPN before attempting to log in to the workshop server.
+
+WSU uses **GlobalProtect VPN**.
+
+### 1. Download GlobalProtect
+
+Open the WSU GlobalProtect download page in your web browser:
+
+👉 https://vpn.wsu.edu/global-protect/getsoftwarepage.esp
+
+Sign in using your **WSU Network ID** if prompted and complete multifactor authentication.
+
+Download the appropriate **GlobalProtect** installer for your operating system.
+
+### 🪟 Windows
+
+Most modern Windows computers use the **64-bit** installer.
+
+After downloading:
+
+1. Open the downloaded installer.
+2. Click **Next**.
+3. Keep the default installation location unless you have a reason to change it.
+4. Continue through the installation.
+5. Click **Close** when installation is complete.
+6. Open **GlobalProtect** from the Windows Start menu if it does not start automatically.
+
+### 🍎 macOS
+
+Download the **Mac GlobalProtect agent**.
+
+After downloading:
+
+1. Open the downloaded installer.
+2. Run the **GlobalProtect Installer**.
+3. Click **Continue** through the installation steps.
+4. Install the GlobalProtect package.
+5. If macOS asks you to approve the Palo Alto Networks system extension, open **System Settings** and allow it.
+6. Complete the installation.
+
+---
+
+### 2. Connect to the WSU VPN
+
+Open **GlobalProtect**.
+
+When asked for the portal address, enter:
+
+```text
+vpn.wsu.edu
+```
+
+> ⚠️ Enter only `vpn.wsu.edu` in GlobalProtect. Do **not** enter `https://vpn.wsu.edu`.
+
+Click **Connect**.
+
+Sign in using your **WSU Network ID credentials** and complete multifactor authentication if prompted.
+
+When the connection is successful, GlobalProtect should show:
+
+```text
+Connected
+```
+
+> 💡 You only need the VPN when you are not already connected to the WSU network.
+
+Once GlobalProtect shows **Connected**, continue with the computer setup and server login instructions below.
+
+---
+
+<details>
+<summary><strong>Click here to view Windows and macOS computer setup instructions 💻 🔧</strong></summary>
+
+<br>
 
 ### 🪟 Windows Users
 
@@ -132,7 +208,7 @@ You can test graphical support from Ubuntu with:
 xclock
 ```
 
-A small clock window should appear. 🕐  
+A small clock window should appear. 🕐
 
 ---
 
@@ -287,23 +363,27 @@ To download a **single file** from the workshop server:
 ```bash
 scp studentXX@10.104.58.24:/path/to/file .
 ```
-To download a whole directory, add -r:  
+
+To download a whole directory, add `-r`:
 
 ```bash
 scp -r studentXX@10.104.58.24:/path/to/directory .
 ```
-The . at the end means download the file or directory to your current local directory.
+
+The `.` at the end means download the file or directory to your current local directory.
 
 For example:
 
 ```bash
 scp student01@10.104.58.24:/workshop/students/student01/results.txt .
 ```
-or for a whole directory:  
+
+or for a whole directory:
 
 ```bash
 scp -r student01@10.104.58.24:/workshop/students/student01/results .
 ```
+
 💡 You can check your current local directory before downloading with:
 
 ```bash
@@ -392,17 +472,20 @@ Username: studentXX
 /workshop/students/studentXX
 ```
 
-✅ Please verify that you can **log in to the server, transfer a file using FileZilla, and open `xclock` using X11 forwarding before the workshop.**
+✅ Please verify that you can **connect to the WSU VPN if needed, log in to the server, transfer a file using FileZilla, and open `xclock` using X11 forwarding before the workshop.**
 
----
 </details>
 
+---
+
 > **Working directory:** Before starting, make sure you are in your own workshop directory.
+
 ```bash
 cd ~/workshop     # cd means change directory
-pwd               # pwd means print working directoy
+pwd               # pwd means print working directory
 ls                # ls means list content
 ```
+
 
 <details>
 <summary><strong>Click to view some useful bash commands</strong></summary>
