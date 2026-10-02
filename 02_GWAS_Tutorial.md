@@ -122,6 +122,12 @@ or if you want a little more:
 ```bash
 head -n 20 /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
+If you prefer to view the metadata in a spreadsheet-like format, you can use Gnumeric:
+
+```bash
+gnumeric /workshop/data/SRD_HFL_AI_50K_metadata.csv
+```
+
 
 This lets you quickly check the column names, overall structure, possible covariates, and the way the metadata is stored.
 
@@ -665,6 +671,20 @@ srd_pca_Protocol.jpg
 covariate_statistical_tests.csv
 covariates.txt
 ```
+
+You can inspect the covariate test results directly in the terminal:
+
+```bash
+head covariate_statistical_tests.csv
+```
+or open the results as a spreadsheet:
+
+```bash
+gnumeric covariate_statistical_tests.csv
+```
+💡 Gnumeric is particularly useful here because the covariates, test statistics, and p-values are easier to compare when displayed as rows and columns.
+
+
 
 ---
 
