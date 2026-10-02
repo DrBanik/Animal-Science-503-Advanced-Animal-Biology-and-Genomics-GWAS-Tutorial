@@ -4,21 +4,17 @@ This tutorial walks through the bovine GWAS workflow used for the workshop. Run 
 
 <sub>*For shorter commands, it is better to type out each command manually rather than copying directly. This helps you get accustomed to the bash and R environments.*</sub>
 
-## Workflow overview
+## ✅ Before class to-do list
 
-1. Quality control filtering on call rates and MAF.
-2. Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and zoomed-tail plots, followed by HWE filtering.
-3. PCA calculation.
-4. Scree plot generation, metadata PCA plots, covariate testing, and covariate-file export.
-5. Whole-genome representation including chromosome X.
-6. Association testing across six covariate models under additive, dominant, and recessive inheritance modes.
-7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
+Please try to complete these **before class** so we do not spend the whole workshop troubleshooting installations 😅
 
----
+1. Download the **WSU VPN (GlobalProtect)**
+2. Download **FileZilla**
+3. **Windows users:** install **WSL / Ubuntu**
+4. **Mac users:** install **XQuartz**
+5. Contact **Mosope** if you have any questions about installation **before the class**
 
-## 💻 Computer Setup and Server Login
-
-Please complete the setup below **before the workshop**.
+> ⚠️ **Important:** You must be connected to the **WSU network or WSU VPN** to access the workshop server.
 
 Your assigned username will be `student01`, `student02`, etc. Replace `studentXX` in all commands below with your assigned student number.
 
@@ -28,7 +24,17 @@ For example:
 ssh -Y student01@10.104.58.24
 ```
 
-> ⚠️ **Important:** You must be connected to the **WSU network or WSU VPN** to access the workshop server.
+---
+
+## Workflow overview
+
+1. Quality control filtering on call rates and MAF.
+2. Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and zoomed-tail plots, followed by HWE filtering.
+3. PCA calculation.
+4. Scree plot generation, metadata PCA plots, covariate testing, and covariate-file export.
+5. Whole-genome representation including chromosome X.
+6. Association testing across six covariate models under additive, dominant, and recessive inheritance modes.
+7. Standalone Manhattan plots for FDR-adjusted and nominal p-values, plus matching Q-Q plots with genomic inflation (`lambda`).
 
 ---
 
@@ -74,8 +80,6 @@ After downloading:
 5. If macOS asks you to approve the Palo Alto Networks system extension, open **System Settings** and allow it.
 6. Complete the installation.
 
----
-
 ### 2. Connect to the WSU VPN
 
 Open **GlobalProtect**.
@@ -100,14 +104,9 @@ Connected
 
 > 💡 You only need the VPN when you are not already connected to the WSU network.
 
-Once GlobalProtect shows **Connected**, continue with the computer setup and server login instructions below.
-
 ---
 
-<details>
-<summary><strong>Click here to view Windows and macOS computer setup instructions 💻 🔧</strong></summary>
-
-<br>
+## 💻 Computer setup and server login
 
 ### 🪟 Windows Users
 
@@ -125,9 +124,7 @@ If needed, download/update PowerShell here:
 
 👉 https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
 
----
-
-#### 2. Install or Update Windows Subsystem for Linux (WSL)
+#### 2. Install or update WSL
 
 Open **PowerShell as Administrator**.
 
@@ -149,19 +146,12 @@ You can check the installation with:
 
 ```powershell
 wsl --version
-```
-
-and:
-
-```powershell
 wsl --list --verbose
 ```
 
 Restart your computer if Windows asks you to do so.
 
----
-
-#### 3. Start Ubuntu and Create Your Linux User
+#### 3. Start Ubuntu and create your Linux user
 
 Open **Ubuntu** from the Start menu.
 
@@ -182,19 +172,12 @@ Install the utilities needed for the workshop and X11 authentication:
 sudo apt install -y xauth x11-apps openssh-client
 ```
 
----
-
 #### 4. Update WSLg
 
 From **Windows PowerShell**, not from inside Ubuntu, run:
 
 ```powershell
 wsl --update
-```
-
-Then restart WSL:
-
-```powershell
 wsl --shutdown
 ```
 
@@ -210,9 +193,7 @@ xclock
 
 A small clock window should appear. 🕐
 
----
-
-#### 5. Connect to the Workshop Server
+#### 5. Connect to the workshop server
 
 From the Ubuntu/WSL terminal:
 
@@ -260,7 +241,7 @@ A clock window should appear on your Windows desktop. ✅
 
 ---
 
-### 🖥️ PuTTY — Optional for Windows Users
+### 🖥️ PuTTY — optional for Windows users
 
 Windows users who prefer a graphical SSH client may also install **PuTTY**.
 
@@ -279,12 +260,6 @@ Protocol:  SSH
 When prompted for a username, enter your assigned `studentXX` username.
 
 > ℹ️ **Note:** PuTTY is convenient for normal terminal access, but PuTTY alone does not provide an X server. If you need graphical/X11 applications, using **Ubuntu through WSL/WSLg** is encouraged.
-
-For X11 from WSL/Ubuntu, use:
-
-```bash
-ssh -Y studentXX@10.104.58.24
-```
 
 ---
 
@@ -310,11 +285,7 @@ If you already use Homebrew, you can also install XQuartz from the command line:
 brew install --cask xquartz
 ```
 
-After installation, log out and log back in before testing X11 forwarding.
-
----
-
-#### 2. Connect Using Terminal
+#### 2. Connect using Terminal
 
 Open the macOS **Terminal** application and connect with:
 
@@ -354,7 +325,7 @@ The clock should appear through XQuartz. 🕐✅
 
 ---
 
-### 📂 File Transfer — Windows and macOS
+### 📂 File transfer — Windows and macOS
 
 The simplest way to transfer files is to use `scp` directly from the terminal on your local computer.
 
@@ -390,7 +361,7 @@ scp -r student01@10.104.58.24:/workshop/students/student01/results .
 pwd
 ```
 
-Otherwise, Windows and macOS users are encouraged to download FileZilla Client for an easier graphical way to transfer files between your computer and the workshop server.
+Otherwise, Windows and macOS users are encouraged to download **FileZilla Client** for an easier graphical way to transfer files between your computer and the workshop server.
 
 Download FileZilla here:
 
@@ -404,14 +375,6 @@ Host:     10.104.58.24
 Port:     22
 Username: studentXX
 Password: Your assigned workshop password
-```
-
-For example, `student01` would use:
-
-```text
-Host:     10.104.58.24
-Port:     22
-Username: student01
 ```
 
 Your personal workshop directory is:
@@ -436,7 +399,7 @@ Your Linux home directory is:
 
 ---
 
-### 🚀 Quick Reference
+### 🚀 Quick reference
 
 **Windows — recommended login with X11 support:**
 
@@ -474,23 +437,20 @@ Username: studentXX
 
 ✅ Please verify that you can **connect to the WSU VPN if needed, log in to the server, transfer a file using FileZilla, and open `xclock` using X11 forwarding before the workshop.**
 
-</details>
-
 ---
 
 > **Working directory:** Before starting, make sure you are in your own workshop directory.
 
 ```bash
-cd ~/workshop     # cd means change directory
-pwd               # pwd means print working directory
-ls                # ls means list content
+cd ~/workshop     # cd = change directory; directory means folder
+pwd               # pwd = print working directory
+ls                # ls = list contents
 ```
-
 
 <details>
 <summary><strong>Click to view some useful bash commands</strong></summary>
 
-<br> 
+<br>
 
 Below is a list of useful commands 😏
 
@@ -569,6 +529,22 @@ The metadata file used later is:
 /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
 
+Before jumping into PCA and GWAS, it is a good idea to first inspect the metadata structure so you know what variables are available and what may be useful as covariates.
+
+For example:
+
+```bash
+head /workshop/data/SRD_HFL_AI_50K_metadata.csv
+```
+
+or if you want a little more:
+
+```bash
+head -n 20 /workshop/data/SRD_HFL_AI_50K_metadata.csv
+```
+
+This lets you quickly check the column names, overall structure, possible covariates, and the way the metadata is stored.
+
 ---
 
 ## 1. Initial Quality Control: Call Rate and MAF
@@ -582,15 +558,13 @@ plink --version
 plink --help
 ```
 
-If the help output is too long, pipe the output to less, so you can scroll pages using the space bar, and use g/G to go to the first/Last page respectively. Use q to exit when you have finished viewing the file.
+If the help output is too long, pipe the output to `less`, so you can scroll pages using the space bar, and use `g`/`G` to go to the first/last page respectively. Use `q` to exit when you have finished viewing the file.
 
 ```bash
 plink --help | less
 ```
 
-Now that you have verified the version and viewed the help menu,
-
-Run the following command:
+Now that you have verified the version and viewed the help menu, run the following command:
 
 ```bash
 plink \
@@ -604,25 +578,26 @@ plink \
     --out srd_qc
 ```
 
+This command tells PLINK to read the PED/MAP dataset, keep SNPs with minor allele frequency of at least 5% (`--maf 0.05`), remove markers with more than 10% missing genotypes (`--geno 0.10`), remove animals with more than 10% missing genotypes (`--mind 0.10`), and write the output in binary PLINK format (`.bed`, `.bim`, `.fam`) using the prefix `srd_qc`.
+
+`--allow-no-sex` is included because sex coding is not the focus here, and we do not want missing/ambiguous sex values to stop the analysis.
+
 ### Oops! What happened? 🤭
 
 What error message are you getting and why? Read the error message carefully.
 
-**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?  
+**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
 
-   
 <details>
-<summary><strong>Clue 🤔🧐</strong></summary>  
-    
+<summary><strong>Clue 🤔🧐</strong></summary>
+
 <p align="left">
   <img src="images/holstein.jpg" width="300" alt="Tutorial Overview" />
   <br>
   <sub><i>Source: <a href="https://www.agdaily.com/livestock/facts-about-holstein-cattle-cows/">AGDAILY</a></i></sub>
 </p>
 
-
 </details>
-
 
 <details>
 <summary><strong>Click to reveal the solution 🤫</strong></summary>
@@ -678,25 +653,26 @@ plink \
     --out plink_results_hwinb
 ```
 
-If you got an error, click below
+`--hardy` asks PLINK to calculate Hardy-Weinberg equilibrium statistics for each marker. HWE is useful here as a quality-control check because markers showing extreme deviation from expected genotype proportions can sometimes reflect genotyping error, batch effects, or problematic loci.
+
+If you got an error, click below.
 
 <details>
 <summary><strong>Click here if you got an error</strong></summary>
 
-<br> 
+<br>
 
-So you fell for this again eh? 🫣  
+So you fell for this again eh? 🫣
 
 You might want to think through the error first, before peeking below 🧑‍💻🧠
 </details>
 
-
 <details>
 <summary><strong>Do you want to reveal the correct code? 😏</strong></summary>
 
-<br> 
+<br>
 
-OK, enough teasing, here is the correct code. Just add --cow. 🫩
+OK, enough teasing, here is the correct code. Just add `--cow`. 🫩
 
 ```bash
 plink \
@@ -707,7 +683,6 @@ plink \
 ```
 </details>
 
-
 The HWE results are written to:
 
 ```text
@@ -716,15 +691,21 @@ plink_results_hwinb.hwe
 
 ### Plot the HWE distribution in R
 
-For a longer R block, it is usually easier to save the code in an R script instead of pasting it line-by-line into the R console.
+For a longer R block, **Geany** is preferred because it is more flexible and easier to edit visually. If you are already comfortable in the command line, `nano` is also very fast and works well.
 
-Create a script with `nano`:
+Create a script with **Geany**:
+
+```bash
+geany hwe_plots.R
+```
+
+If you prefer `nano`, you can use:
 
 ```bash
 nano hwe_plots.R
 ```
 
-Paste the R code below into the file. In `nano`, save with **Ctrl+O**, press **Enter**, then exit with **Ctrl+X**.
+Paste the R code below into the file. In `nano`, save with **Ctrl+O**, press **Enter**, then exit with **Ctrl+X**. In Geany, you can use the normal menu or keyboard shortcuts to save.
 
 Run the completed script with:
 
@@ -833,12 +814,14 @@ To view the plot, use:
 ```bash
 feh hwe_distribution_plots.png
 ```
-If the image is too large, play around with the --zoom flag to fit your desired viewing %. Here, we use 50:
+
+If the image is too large, play around with the `--zoom` flag to fit your desired viewing %. Here, we use 50:
 
 ```bash
 feh --zoom 50 hwe_distribution_plots.png
 ```
-> 💡 If you have troubles viewing the plot, you can download the plot using scp or filezilla.
+
+> 💡 If you have trouble viewing the plot, you can download the plot using `scp` or FileZilla.
 
 Based on the plot, what threshold should be used for HWE?
 
@@ -854,6 +837,8 @@ plink \
     --make-bed \
     --out srd_qc_hwe
 ```
+
+`--hwe 3e-9` removes markers with very extreme deviation from Hardy-Weinberg equilibrium. We are not trying to remove every slight departure from HWE; we are mainly removing the tail of markers that look unusually problematic based on the HWE distribution.
 
 ### Main output
 
@@ -878,6 +863,8 @@ plink \
     --out srd_pca
 ```
 
+PCA is calculated to summarize major patterns of genetic similarity and population structure in the dataset. This is important because hidden structure can confound GWAS and produce misleading association signals if not accounted for.
+
 ### Main output
 
 ```text
@@ -898,15 +885,25 @@ This R section:
 - tests candidate covariates against the binary phenotype;
 - exports a covariate file for the GWAS models.
 
-Because this is a long block, save it as a script:
+We use this step to decide which non-genetic and structure-related variables may need to be carried forward into the GWAS models.
+
+We also focus mainly on **PC1 and PC2** because they usually explain the largest share of the structure, and in this tutorial they are selected based on the scree plot "elbow" idea — after the first few PCs, the additional variance explained starts to level off.
+
+Because this is a long block, save it as a script.
+
+Geany is preferred:
+
+```bash
+geany pca_covariates.R
+```
+
+If you prefer the command line:
 
 ```bash
 nano pca_covariates.R
 ```
 
-Paste the code below, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
-
-Run it with:
+Paste the code below, save the file, and run it with:
 
 ```bash
 Rscript pca_covariates.R
@@ -1071,8 +1068,9 @@ write.table(covar_df, "covariates.txt", row.names = FALSE, col.names = TRUE, quo
 ```
 
 If you used an interactive R session instead of `Rscript`, exit without saving the workspace:
+
 ```r
-q("no")    # You can also use Ctrl + d and when prompted to save workplace, type n.
+q("no")    # You can also use Ctrl + d and when prompted to save workspace, type n.
 ```
 
 ### Main outputs
@@ -1103,12 +1101,14 @@ plink \
     --out srd_qc_allchr
 ```
 
+This step prepares the genotype data for whole-genome association testing. `--autosome-num 30` tells PLINK how to handle the chromosome numbering scheme in this dataset, and `--allow-extra-chr` helps PLINK tolerate nonstandard chromosome coding beyond the usual human defaults.
+
 Wait, why did it work 😲? Something looks different here, what is it? 🤔
 
 <details>
 <summary><strong>Clue 🤔🧐</strong></summary>
 
-<video src="https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182" controls autoplay loop playsinline preload="auto" width="100%"></video>
 
 <sub><i>Source: <a href="https://www.tiktok.com/t/ZTUFuSbBq">TikTok</a></i></sub>
 
@@ -1141,6 +1141,10 @@ The six GWAS configurations are:
 5. PC1 + PC2
 6. Sire
 
+We test **additive, dominant, and recessive** models because for many traits, especially traits where the inheritance pattern is not clearly understood, we do not want to assume in advance that the effect is only additive. Different variants can act differently, so testing multiple inheritance models gives us a broader chance of detecting meaningful associations.
+
+We also test multiple **covariate configurations** because association results can be affected by structure and management-related effects. For example, birth year, technician, sire, or PCs may explain variation unrelated to the marker itself. Including covariates helps reduce confounding and lets us compare how robust the signals are across model adjustments.
+
 Run the complete Bash loop as one block:
 
 ```bash
@@ -1163,13 +1167,23 @@ for cov in "unadjusted" "birth_year" "birth_year_group" "technician" "pc1_pc2" "
 done
 ```
 
-Or you can save it as a bash script first with:
+Each PLINK run reads the same genotype dataset (`srd_qc_allchr`), optionally adds a specified covariate or covariates, runs logistic regression under one inheritance model, and writes an output file whose name tells you which covariate setting and inheritance mode were used.
+
+If you prefer, you can save the loop as a bash script first.
+
+Geany option:
+
+```bash
+geany association_all_models.sh
+```
+
+or command-line option:
 
 ```bash
 nano association_all_models.sh
 ```
 
-Then Paste:
+Then paste:
 
 ```bash
 #!/usr/bin/bash
@@ -1192,13 +1206,39 @@ for cov in "unadjusted" "birth_year" "birth_year_group" "technician" "pc1_pc2" "
 done
 ```
 
-Then, execute with
+Then execute with:
 
 ```bash
 bash association_all_models.sh
 ```
 
 This produces `.assoc.logistic` files for each covariate/inheritance-model combination.
+
+### Quickly inspect one GWAS result file
+
+A fast way to inspect one output is:
+
+```bash
+head gwas_unadjusted_ADD.assoc.logistic
+```
+
+If you specifically want to view the additive test rows:
+
+```bash
+awk 'NR==1 || $5=="ADD"' gwas_unadjusted_ADD.assoc.logistic | head
+```
+
+This file contains the marker-level association results. Important columns include:
+
+- `CHR` = chromosome
+- `SNP` = marker name
+- `BP` = base-pair position
+- `A1` = coded allele
+- `TEST` = test being reported
+- `NMISS` = number of animals used for that marker
+- `OR` = odds ratio
+- `STAT` = test statistic
+- `P` = p-value
 
 ---
 
@@ -1210,13 +1250,19 @@ This section generates:
 - nominal Manhattan plots with a red dashed line at `p < 1e-5`;
 - Q-Q plots with genomic inflation (`lambda`) displayed on each plot.
 
-Save the plotting code as an R script:
+Save the plotting code as an R script.
+
+Geany option:
+
+```bash
+geany gwas_plots.R
+```
+
+Command-line option:
 
 ```bash
 nano gwas_plots.R
 ```
-
-Paste the code below, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
 
 Run it with:
 
@@ -1453,7 +1499,7 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 | Initial QC | `plink --file ... --maf --geno --mind --make-bed` | `srd_qc.*` |
 | HWE calculation | `plink --bfile srd_qc --hardy` | `plink_results_hwinb.hwe` |
 | HWE plots | `Rscript hwe_plots.R` | `hwe_distribution_plots.png` |
-| HWE filtering | `plink --bfile srd_qc --hwe 1e-6 --make-bed` | `srd_qc_hwe.*` |
+| HWE filtering | `plink --bfile srd_qc --hwe 3e-9 --make-bed` | `srd_qc_hwe.*` |
 | PCA | `plink --bfile srd_qc_hwe --pca` | `srd_pca.eigenval`, `srd_pca.eigenvec` |
 | PCA/covariates | `Rscript pca_covariates.R` | PCA plots, `covariates.txt` |
 | Whole-genome dataset | `plink ... --autosome-num 30 ...` | `srd_qc_allchr.*` |
@@ -1465,8 +1511,9 @@ The same naming pattern is used for the remaining covariate and inheritance mode
 - Run commands from your own `~/workshop` directory so your output files stay separate from other students' work.
 - Read the PLINK `.log` file after every major PLINK command. It records how many animals and SNPs were loaded, removed, and retained.
 - Do not delete intermediate files until the workflow is complete; later steps depend on several of them.
-- When using `nano`, save with **Ctrl+O**, press **Enter**, and exit with **Ctrl+X**.
-- If an R script stops with an error, read the first error message before rerunning the script. Later errors may simply be consequences of the first one.
+- If you use **Geany**, it is a nice lightweight editor and easier for most people to navigate visually.
+- If you use **nano**, it is usually faster if you are already comfortable in the terminal.
+- If an R script stops with an error, read the **first** error message before rerunning the script. Later errors may simply be consequences of the first one.
 
 ## The End! :grin: :clap:
 <p align="center">
