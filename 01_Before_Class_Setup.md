@@ -12,7 +12,7 @@ Please try to complete these **before class** so we do not spend the whole works
 4. **Mac users:** install **XQuartz**
 5. Contact **Mosope** if you have any questions about installation **before the class**
 
-> ⚠️ **Important:** You must be connected to the **WSU network or WSU VPN** to access the workshop server.
+> ⚠️ **Important:** You must be connected to the **WSU VPN** to access the workshop server.
 
 Your assigned username will be `student01`, `student02`, etc. Replace `studentXX` in all commands below with your assigned student number.
 
