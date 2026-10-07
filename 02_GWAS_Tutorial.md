@@ -1497,12 +1497,30 @@ You can therefore choose:
 - `3` = both nominal and FDR Manhattan plots;
 - `1,2` = also generates both nominal and FDR Manhattan plots.
 
+Normally, run:
+
+``` bash
+Rscript gwas_plots.R
+```
+
+and enter your choice when prompted.
+
+You can also supply the choice directly on the command line:
+
+``` bash
+Rscript gwas_plots.R 1     # nominal only
+Rscript gwas_plots.R 2     # FDR only
+Rscript gwas_plots.R 3     # both
+Rscript gwas_plots.R 1,2   # both
+```
+
 The Q-Q plot is generated automatically for every completed GWAS run
 regardless of the Manhattan option selected.
 
-> **Note:** The plotting script uses `readLines(stdin())` for this menu
-> so that the prompt works when the script is launched with
-> `Rscript gwas_plots.R`.
+> **Note:** When the script is run with `Rscript gwas_plots.R`, it reads
+> the response directly from the Linux terminal (`/dev/tty`). This makes
+> the prompt work reliably in our SSH/container environment. You can
+> also pass the choice directly, for example `Rscript gwas_plots.R 3`.
 
 The plotting script is intentionally **not hard-coded to a fixed list of
 covariates**. Instead, it reads:
@@ -1725,14 +1743,49 @@ cat("1. Nominal (p < 1e-5)\n")
 cat("2. FDR (FDR < 0.05)\n")
 cat("3. Both\n\n")
 
-cat("Enter selection [use 1,2 or 3 for both]: ")
-flush.console()
+# ------------------------------------------------------------
+# Get Manhattan selection
+#
+# Normal classroom use:
+#   Rscript gwas_plots.R
+#   -> the script prompts for a choice
+#
+# Optional non-interactive use:
+#   Rscript gwas_plots.R 1
+#   Rscript gwas_plots.R 2
+#   Rscript gwas_plots.R 3
+#   Rscript gwas_plots.R 1,2
+# ------------------------------------------------------------
+args <- commandArgs(trailingOnly = TRUE)
 
-# readLines(stdin()) is used instead of readline() so the prompt works
-# when this script is run with: Rscript gwas_plots.R
-manhattan_choice <- trimws(
-  readLines(con = stdin(), n = 1, warn = FALSE)
-)
+if (length(args) >= 1 && nzchar(trimws(args[1]))) {
+
+  # A choice was supplied directly on the command line.
+  manhattan_choice <- trimws(args[1])
+
+} else {
+
+  # Rscript can receive EOF from stdin in some SSH/container setups.
+  # Read directly from the student's controlling terminal instead.
+  cat("Enter selection [use 1,2 or 3 for both]: ")
+  flush.console()
+
+  if (!file.exists("/dev/tty")) {
+    stop(
+      paste0(
+        "No interactive terminal was detected. ",
+        "Run the script with a selection, for example: ",
+        "Rscript gwas_plots.R 3"
+      )
+    )
+  }
+
+  tty_con <- file("/dev/tty", open = "r")
+  manhattan_choice <- trimws(
+    readLines(con = tty_con, n = 1, warn = FALSE)
+  )
+  close(tty_con)
+}
 
 if (length(manhattan_choice) == 0 || manhattan_choice == "") {
   stop("No Manhattan selection entered. Use 1, 2, 3, or 1,2.")
