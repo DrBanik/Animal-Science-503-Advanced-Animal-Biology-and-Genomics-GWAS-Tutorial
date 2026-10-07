@@ -1473,7 +1473,25 @@ Birth Year + Sire
 ## 7. Generate Standalone Manhattan and Q-Q Plots
 
 This section generates Manhattan and Q-Q plots for the GWAS analyses you
-completed.
+completed **and creates a tab-separated summary file of the GWAS
+results**.
+
+The summary file is:
+
+``` text
+gwas_results_summary.tsv
+```
+
+It contains one row for every GWAS run listed in
+`gwas_run_manifest.tsv`. Therefore, it automatically reflects only the
+covariates and inheritance models that were actually tested.
+
+For example:
+
+- if you run only Unadjusted Additive and PC1 + PC2 Additive, the TSV
+  will contain **2 rows**;
+- if you run all 9 predefined covariate configurations under Additive,
+  Dominant, and Recessive inheritance, the TSV will contain **27 rows**.
 
 To keep the plotting step simple and interactive, we will use **two
 scripts**:
@@ -1779,6 +1797,11 @@ completed_runs <- 0
 skipped_runs <- 0
 
 # ------------------------------------------------------------
+# Build one summary row for every GWAS run that is processed
+# ------------------------------------------------------------
+summary_rows <- list()
+
+# ------------------------------------------------------------
 # Plot every completed GWAS listed in the manifest
 # ------------------------------------------------------------
 for (i in seq_len(total_runs)) {
@@ -1825,6 +1848,65 @@ for (i in seq_len(total_runs)) {
   }
 
   cat("  SNP rows:", comma(nrow(df)), "\n")
+  flush(stdout())
+
+  # ----------------------------------------------------------
+  # Calculate summary statistics for this GWAS run
+  # ----------------------------------------------------------
+  chisq_values <- qchisq(1 - df$P, df = 1)
+
+  lambda_gc <- median(chisq_values, na.rm = TRUE) /
+    qchisq(0.5, df = 1)
+
+  # PLINK's NMISS column gives the number of animals contributing
+  # non-missing data to each SNP test. After QC this is usually the
+  # same across SNPs, but the median is used here to remain robust.
+  if ("NMISS" %in% names(df)) {
+    n_animals <- as.integer(round(median(df$NMISS, na.rm = TRUE)))
+  } else {
+    n_animals <- NA_integer_
+  }
+
+  n_snps <- nrow(df)
+
+  top_index <- which.min(df$P)
+
+  top_snp <- as.character(df$SNP[top_index])
+  top_chr <- as.character(df$CHR_LABEL[top_index])
+  top_bp  <- df$BP[top_index]
+  min_p   <- df$P[top_index]
+  min_fdr <- df$FDR[top_index]
+
+  n_nominal <- sum(df$P < 1e-5, na.rm = TRUE)
+  n_fdr     <- sum(df$FDR < 0.05, na.rm = TRUE)
+
+  summary_rows[[length(summary_rows) + 1]] <- data.frame(
+    PREFIX = r$PREFIX,
+    COVARIATE = r$TITLE,
+    MODEL = r$MODEL,
+    TEST_ID = r$TEST_ID,
+    N_ANIMALS = n_animals,
+    N_SNPS = n_snps,
+    LAMBDA_GC = lambda_gc,
+    TOP_SNP = top_snp,
+    CHR = top_chr,
+    BP = top_bp,
+    MIN_P = min_p,
+    MIN_FDR = min_fdr,
+    N_P_LT_1E5 = n_nominal,
+    N_FDR_LT_0.05 = n_fdr,
+    stringsAsFactors = FALSE
+  )
+
+  cat(
+    sprintf(
+      "  Summary: N animals = %s | N SNPs = %s | lambdaGC = %.3f | min P = %.3g\n",
+      ifelse(is.na(n_animals), "NA", format(n_animals, big.mark = ",")),
+      format(n_snps, big.mark = ","),
+      lambda_gc,
+      min_p
+    )
+  )
   flush(stdout())
 
   model_short <- tolower(substr(r$MODEL, 1, 3))
@@ -1890,11 +1972,39 @@ for (i in seq_len(total_runs)) {
   completed_runs <- completed_runs + 1
 }
 
+# ------------------------------------------------------------
+# Write the GWAS summary TSV
+# ------------------------------------------------------------
+summary_file <- "gwas_results_summary.tsv"
+
+if (length(summary_rows) > 0) {
+
+  gwas_summary <- bind_rows(summary_rows)
+
+  write.table(
+    gwas_summary,
+    file = summary_file,
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE,
+    na = "NA"
+  )
+
+  cat("\nGWAS summary written to:", summary_file, "\n")
+  cat("Summary rows:", nrow(gwas_summary), "\n")
+  flush(stdout())
+
+} else {
+
+  warning("No valid GWAS runs were available for the summary TSV.")
+}
+
 cat("\n============================================================\n")
 cat("ALL PLOTTING COMPLETE\n")
 cat("============================================================\n")
 cat("Completed GWAS runs:", completed_runs, "\n")
 cat("Skipped GWAS runs:  ", skipped_runs, "\n")
+cat("Summary TSV:        ", summary_file, "\n")
 cat("Plot files are in:  ", getwd(), "\n")
 cat("============================================================\n\n")
 flush(stdout())
@@ -2048,6 +2158,7 @@ Manhattan plots:
 ------------------------------------------------------------
   Reading: gwas_unadjusted_ADD.assoc.logistic
   SNP rows: 49,850
+  Summary: N animals = 126 | N SNPs = 49,850 | lambdaGC = 1.012 | min P = 3.21e-06
   Creating nominal Manhattan plot...
   DONE: manhattan_nominal_unadjusted_add.png
   Creating FDR Manhattan plot...
@@ -2061,6 +2172,7 @@ Manhattan plots:
 ------------------------------------------------------------
   Reading: gwas_pc1_pc2_ADD.assoc.logistic
   SNP rows: 49,850
+  Summary: N animals = 126 | N SNPs = 49,850 | lambdaGC = 1.012 | min P = 3.21e-06
   Creating nominal Manhattan plot...
   DONE: manhattan_nominal_pc1_pc2_add.png
   Creating FDR Manhattan plot...
@@ -2072,18 +2184,67 @@ Manhattan plots:
 ============================================================
 ALL PLOTTING COMPLETE
 ============================================================
+GWAS summary written to: gwas_results_summary.tsv
+Summary rows: 2
+
 Completed GWAS runs: 2
 Skipped GWAS runs:   0
+Summary TSV:         gwas_results_summary.tsv
 Plot files are in:   /home/studentXX/workshop
 ============================================================
 ```
 
-The exact SNP count and working-directory path may differ, but the
-progress messages should follow this pattern.
+The exact SNP count, lambda value, minimum P-value, and
+working-directory path will depend on the analysis.
+
+### GWAS summary TSV
+
+At the end of the run, the script creates:
+
+``` text
+gwas_results_summary.tsv
+```
+
+Each row represents one completed covariate × inheritance-model GWAS.
+
+The columns are:
+
+| Column          | Meaning                                                                                |
+|-----------------|----------------------------------------------------------------------------------------|
+| `PREFIX`        | PLINK output prefix for that GWAS                                                      |
+| `COVARIATE`     | Covariate configuration used                                                           |
+| `MODEL`         | Additive, Dominant, or Recessive                                                       |
+| `TEST_ID`       | PLINK test identifier (`ADD`, `DOM`, or `REC`)                                         |
+| `N_ANIMALS`     | Typical number of animals contributing to the SNP tests, calculated from PLINK `NMISS` |
+| `N_SNPS`        | Number of SNPs with valid P-values for that model                                      |
+| `LAMBDA_GC`     | Genomic inflation factor calculated from the valid P-values                            |
+| `TOP_SNP`       | SNP with the smallest P-value                                                          |
+| `CHR`           | Chromosome of the top SNP                                                              |
+| `BP`            | Base-pair position of the top SNP                                                      |
+| `MIN_P`         | Smallest observed P-value                                                              |
+| `MIN_FDR`       | FDR-adjusted P-value for the top SNP                                                   |
+| `N_P_LT_1E5`    | Number of SNPs with nominal `P < 1e-5`                                                 |
+| `N_FDR_LT_0.05` | Number of SNPs with `FDR < 0.05`                                                       |
+
+You can inspect the summary directly in the terminal:
+
+``` bash
+column -t -s $'\t' gwas_results_summary.tsv | less -S
+```
+
+or:
+
+``` bash
+head gwas_results_summary.tsv
+```
+
+This summary is **dynamic**. It follows `gwas_run_manifest.tsv`, so no
+extra editing is needed when a different set of covariates or
+inheritance models is selected.
 
 If you run all nine predefined covariate configurations under all three
-inheritance models, the manifest contains **27 GWAS runs**. The terminal
-will then show:
+inheritance models, the manifest contains **27 GWAS runs**. The TSV will
+also contain **27 result rows**, and the terminal will show:
 
 ``` text
 [1/27] ...
@@ -2257,7 +2418,7 @@ configurations and additive, dominant, and recessive inheritance models.
 | Flexible GWAS        | `./run_gwas.sh`                                   | `.assoc.logistic` files + `gwas_run_manifest.tsv` |
 | In-class GWAS        | Covariates `1,4`; model `1`                       | Unadjusted ADD + PC1/PC2 ADD                      |
 | Homework GWAS        | Covariates `ALL`; model `ALL`                     | Presets 1-9 × ADD/DOM/REC                         |
-| Manhattan/Q-Q plots  | `./plot_gwas.sh`                                  | `.png` plots for runs in the manifest             |
+| Manhattan/Q-Q plots  | `./plot_gwas.sh`                                  | `.png` plots + `gwas_results_summary.tsv`         |
 
 ## Notes for students ✍️📖
 
