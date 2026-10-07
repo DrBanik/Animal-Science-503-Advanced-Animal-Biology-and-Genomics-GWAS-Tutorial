@@ -1,28 +1,40 @@
 # Hands-on Tutorial: Quality Control, Population Structure, and Multi-Model GWAS
 
-This tutorial walks through the bovine GWAS workflow used for the workshop. Run the commands in order and keep all generated output files in your own `~/workshop` directory unless otherwise stated.  
+This tutorial walks through the bovine GWAS workflow used for the
+workshop. Run the commands in order and keep all generated output files
+in your own `~/workshop` directory unless otherwise stated.
 
-<sub>*For shorter commands, it is better to type out each command manually rather than copying directly. This helps you get accustomed to the bash and R environments.*</sub>
+<sub>*For shorter commands, it is better to type out each command
+manually rather than copying directly. This helps you get accustomed to
+the bash and R environments.*</sub>
 
 ## Workflow overview
 
-1. Quality control filtering on call rates and MAF.
-2. Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and zoomed-tail plots, followed by data-informed HWE filtering.
-3. PCA calculation.
-4. Scree plot generation, metadata PCA plots, covariate testing, and covariate-file export.
-5. Whole-genome representation including chromosome X.
-6. In class, run **additive GWAS only** for the **unadjusted** and **PC1 + PC2** configurations.
-7. Generate matching Manhattan and Q-Q plots and compare the effect of population-structure adjustment.
-8. Use the flexible GWAS script later to run individual covariates, custom covariate combinations, or the full homework analysis across additive, dominant, and recessive models.
+1.  Quality control filtering on call rates and MAF.
+2.  Hardy-Weinberg equilibrium (HWE) analysis with full-distribution and
+    zoomed-tail plots, followed by data-informed HWE filtering.
+3.  PCA calculation.
+4.  Scree plot generation, metadata PCA plots, covariate testing, and
+    covariate-file export.
+5.  Whole-genome representation including chromosome X.
+6.  In class, run **additive GWAS only** for the **unadjusted** and
+    **PC1 + PC2** configurations.
+7.  Generate matching Manhattan and Q-Q plots and compare the effect of
+    population-structure adjustment.
+8.  Use the flexible GWAS script later to run individual covariates,
+    custom covariate combinations, or the full homework analysis across
+    additive, dominant, and recessive models.
 
+------------------------------------------------------------------------
 
----
+> ⚠️ **Before starting:** Make sure you completed the setup in
+> [`01_Before_Class_Setup.md`](01_Before_Class_Setup.md), are connected
+> to the WSU network or VPN, and can log in to the workshop server.
 
-> ⚠️ **Before starting:** Make sure you completed the setup in [`01_Before_Class_Setup.md`](01_Before_Class_Setup.md), are connected to the WSU network or VPN, and can log in to the workshop server.
+> **Working directory:** Before starting, make sure you are in your own
+> workshop directory.
 
-> **Working directory:** Before starting, make sure you are in your own workshop directory.
-
-```bash
+``` bash
 cd ~/workshop     # cd = change directory; directory means folder
 pwd               # pwd = print working directory
 ls                # ls = list contents
@@ -35,7 +47,7 @@ ls                # ls = list contents
 
 Below is a list of useful commands 😏
 
-```bash
+``` bash
 # --- Navigation & Path Inspection ---
 pwd                                 # Print the absolute path of the current working directory
 cd my_folder                        # Change directory into 'my_folder'
@@ -99,77 +111,97 @@ clear                               # Clear terminal window output (shortcut: Ct
 
 The main genotype input used in this tutorial is:
 
-```text
+``` text
 /workshop/data/SRD_HFL_AI_50K.ped
 /workshop/data/SRD_HFL_AI_50K.map
 ```
 
 The metadata file used later is:
 
-```text
+``` text
 /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
 
-Before jumping into PCA and GWAS, it is a good idea to first inspect the metadata structure so you know what variables are available and what may be useful as covariates.
+Before jumping into PCA and GWAS, it is a good idea to first inspect the
+metadata structure so you know what variables are available and what may
+be useful as covariates.
 
 For example:
 
-```bash
+``` bash
 head /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
 
 or if you want a little more:
 
-```bash
+``` bash
 head -n 20 /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
-If you prefer to view the metadata in a spreadsheet-like format, you can use Gnumeric:
 
-```bash
+If you prefer to view the metadata in a spreadsheet-like format, you can
+use Gnumeric:
+
+``` bash
 gnumeric /workshop/data/SRD_HFL_AI_50K_metadata.csv
 ```
 
-
-This lets you quickly check the column names, overall structure, possible covariates, and the way the metadata is stored.
+This lets you quickly check the column names, overall structure,
+possible covariates, and the way the metadata is stored.
 
 ### What does **metadata** mean?
 
-**Metadata means “data about the data.”** The genotype files contain the SNP genotypes for each animal, while the metadata file contains additional information describing the animals or how the observations were collected. Examples can include the sample ID, sire, birth year, technician, breeding protocol, and other study information.
+**Metadata means “data about the data.”** The genotype files contain the
+SNP genotypes for each animal, while the metadata file contains
+additional information describing the animals or how the observations
+were collected. Examples can include the sample ID, sire, birth year,
+technician, breeding protocol, and other study information.
 
-These variables are important because some may influence the phenotype independently of the SNP being tested. If that happens, they may act as **potential covariates** in the GWAS.
+These variables are important because some may influence the phenotype
+independently of the SNP being tested. If that happens, they may act as
+**potential covariates** in the GWAS.
 
 As you inspect the first few rows, ask yourself:
 
-1. Which column identifies each animal?
-2. Which variables look numerical?
-3. Which variables represent categories or groups?
-4. Which variables might plausibly be associated with the phenotype or population structure?
-5. Which of those variables might therefore need to be considered as GWAS covariates?
+1.  Which column identifies each animal?
+2.  Which variables look numerical?
+3.  Which variables represent categories or groups?
+4.  Which variables might plausibly be associated with the phenotype or
+    population structure?
+5.  Which of those variables might therefore need to be considered as
+    GWAS covariates?
 
-> 💡 We will explore several metadata variables during the PCA/covariate section. The in-class GWAS will focus only on the **unadjusted** and **PC1 + PC2** additive models, but the same workflow can later be used with other covariates.
+> 💡 We will explore several metadata variables during the PCA/covariate
+> section. The in-class GWAS will focus only on the **unadjusted** and
+> **PC1 + PC2** additive models, but the same workflow can later be used
+> with other covariates.
 
----
+------------------------------------------------------------------------
 
 ## 1. Initial Quality Control: Call Rate and MAF
 
-This step applies the initial SNP- and animal-level QC filters and creates a binary PLINK dataset for downstream analyses.
+This step applies the initial SNP- and animal-level QC filters and
+creates a binary PLINK dataset for downstream analyses.
 
 First, check the version and help details for plink.
 
-```bash
+``` bash
 plink --version
 plink --help
 ```
 
-If the help output is too long, pipe the output to `less`, so you can scroll pages using the space bar, and use `g`/`G` to go to the first/last page respectively. Use `q` to exit when you have finished viewing the file.
+If the help output is too long, pipe the output to `less`, so you can
+scroll pages using the space bar, and use `g`/`G` to go to the
+first/last page respectively. Use `q` to exit when you have finished
+viewing the file.
 
-```bash
+``` bash
 plink --help | less
 ```
 
-Now that you have verified the version and viewed the help menu, run the following command:
+Now that you have verified the version and viewed the help menu, run the
+following command:
 
-```bash
+``` bash
 plink \
     --file /workshop/data/SRD_HFL_AI_50K \
     --allow-no-sex \
@@ -181,15 +213,23 @@ plink \
     --out srd_qc
 ```
 
-This command tells PLINK to read the PED/MAP dataset, keep SNPs with minor allele frequency of at least 5% (`--maf 0.05`), remove markers with more than 10% missing genotypes (`--geno 0.10`), remove animals with more than 10% missing genotypes (`--mind 0.10`), and write the output in binary PLINK format (`.bed`, `.bim`, `.fam`) using the prefix `srd_qc`.
+This command tells PLINK to read the PED/MAP dataset, keep SNPs with
+minor allele frequency of at least 5% (`--maf 0.05`), remove markers
+with more than 10% missing genotypes (`--geno 0.10`), remove animals
+with more than 10% missing genotypes (`--mind 0.10`), and write the
+output in binary PLINK format (`.bed`, `.bim`, `.fam`) using the prefix
+`srd_qc`.
 
-`--allow-no-sex` is included because sex coding is not the focus here, and we do not want missing/ambiguous sex values to stop the analysis.
+`--allow-no-sex` is included because sex coding is not the focus here,
+and we do not want missing/ambiguous sex values to stop the analysis.
 
 ### Oops! What happened? 🤭
 
-What error message are you getting and why? Read the error message carefully.
+What error message are you getting and why? Read the error message
+carefully.
 
-**Question:** Why is PLINK having a problem with the chromosome numbers in this dataset?
+**Question:** Why is PLINK having a problem with the chromosome numbers
+in this dataset?
 
 <details>
 <summary><strong>Clue 🤔🧐</strong></summary>
@@ -207,17 +247,19 @@ What error message are you getting and why? Read the error message carefully.
 
 <br>
 
-By default, PLINK assumes that the dataset is **human**. Human autosomes are numbered 1–22, while cattle have **29 autosomes**.
+By default, PLINK assumes that the dataset is **human**. Human autosomes
+are numbered 1–22, while cattle have **29 autosomes**.
 
-We therefore need to tell PLINK that we are working with cattle by adding:
+We therefore need to tell PLINK that we are working with cattle by
+adding:
 
-```bash
+``` bash
 --cow
 ```
 
 The corrected command is:
 
-```bash
+``` bash
 plink \
     --cow \
     --file /workshop/data/SRD_HFL_AI_50K \
@@ -230,33 +272,37 @@ plink \
     --out srd_qc
 ```
 
-After adding `--cow`, PLINK recognizes the bovine chromosome set and the QC analysis can proceed. 😮‍💨
+After adding `--cow`, PLINK recognizes the bovine chromosome set and the
+QC analysis can proceed. 😮‍💨
 
 </details>
 
 ### Main output
 
-```text
+``` text
 srd_qc.bed
 srd_qc.bim
 srd_qc.fam
 srd_qc.log
 ```
 
----
+------------------------------------------------------------------------
 
 ## 2. Hardy-Weinberg Equilibrium and Post-HWE Filtering
 
 First, calculate HWE statistics from the QC-filtered dataset.
 
-```bash
+``` bash
 plink \
     --bfile srd_qc \
     --hardy \
     --out plink_results_hwinb
 ```
 
-`--hardy` asks PLINK to calculate Hardy-Weinberg equilibrium statistics for each marker. HWE is useful here as a quality-control check because markers showing extreme deviation from expected genotype proportions can sometimes reflect genotyping error, batch effects, or problematic loci.
+`--hardy` asks PLINK to calculate Hardy-Weinberg equilibrium statistics
+for each marker. HWE is useful here as a quality-control check because
+markers showing extreme deviation from expected genotype proportions can
+sometimes reflect genotyping error, batch effects, or problematic loci.
 
 If you got an error, click below.
 
@@ -267,7 +313,9 @@ If you got an error, click below.
 
 So you fell for this again eh? 🫣
 
-You might want to think through the error first, before peeking below 🧑‍💻🧠
+You might want to think through the error first, before peeking below
+🧑‍💻🧠
+
 </details>
 
 <details>
@@ -277,48 +325,54 @@ You might want to think through the error first, before peeking below 🧑‍�
 
 OK, enough teasing, here is the correct code. Just add `--cow`. 🫩
 
-```bash
+``` bash
 plink \
     --cow \
     --bfile srd_qc \
     --hardy \
     --out plink_results_hwinb
 ```
+
 </details>
 
 The HWE results are written to:
 
-```text
+``` text
 plink_results_hwinb.hwe
 ```
 
 ### Plot the HWE distribution in R
 
-For a longer R block, **Geany** is preferred because it is more flexible and easier to edit visually. If you are already comfortable in the command line, `nano` is also very fast and works well.
+For a longer R block, **Geany** is preferred because it is more flexible
+and easier to edit visually. If you are already comfortable in the
+command line, `nano` is also very fast and works well.
 
 Create a script with **Geany**:
 
-```bash
+``` bash
 geany hwe_plots.R
 ```
 
 If you prefer `nano`, you can use:
 
-```bash
+``` bash
 nano hwe_plots.R
 ```
 
-Paste the R code below into the file. In `nano`, save with **Ctrl+O**, press **Enter**, then exit with **Ctrl+X**. In Geany, you can use the normal menu or keyboard shortcuts to save.
+Paste the R code below into the file. In `nano`, save with **Ctrl+O**,
+press **Enter**, then exit with **Ctrl+X**. In Geany, you can use the
+normal menu or keyboard shortcuts to save.
 
 Run the completed script with:
 
-```bash
+``` bash
 Rscript hwe_plots.R
 ```
 
-Alternatively, start an interactive R session with `R` and paste the same code directly.
+Alternatively, start an interactive R session with `R` and paste the
+same code directly.
 
-```r
+``` r
 library(tidyverse)
 library(patchwork)
 library(scales)
@@ -408,53 +462,64 @@ ggsave("hwe_distribution_plots.png", plot = hwe_final_plot, width = 13, height =
 
 The plot is saved as:
 
-```text
+``` text
 hwe_distribution_plots.png
 ```
 
 To view the plot, use:
 
-```bash
+``` bash
 feh hwe_distribution_plots.png
 ```
 
-If the image is too large, play around with the `--zoom` flag to fit your desired viewing %. Here, we use 50:
+If the image is too large, play around with the `--zoom` flag to fit
+your desired viewing %. Here, we use 50:
 
-```bash
+``` bash
 feh --zoom 50 hwe_distribution_plots.png
 ```
 
-> 💡 If you have trouble viewing the plot, you can download the plot using `scp` or FileZilla.
+> 💡 If you have trouble viewing the plot, you can download the plot
+> using `scp` or FileZilla.
 
 Based on the plot, what threshold should be used for HWE?
 
 ### Choosing the HWE cutoff from the observed distribution
 
-A commonly used HWE threshold such as `1e-6` can be useful as a general rule, but it should not be treated as a universal biological boundary between a “good” and “bad” SNP.
+A commonly used HWE threshold such as `1e-6` can be useful as a general
+rule, but it should not be treated as a universal biological boundary
+between a “good” and “bad” SNP.
 
-For this exercise, look at the **extreme tail of the HWE distribution** and identify the point where a relatively small group of SNPs begins to separate sharply from the majority of markers. We can think of this as an **empirical breakoff point** or **data-informed QC threshold**.
+For this exercise, look at the **extreme tail of the HWE distribution**
+and identify the point where a relatively small group of SNPs begins to
+separate sharply from the majority of markers. We can think of this as
+an **empirical breakoff point** or **data-informed QC threshold**.
 
 For this dataset, that breakoff occurs at approximately:
 
-```text
+``` text
 -log10(p) ≈ 8.5
 ```
 
 which corresponds approximately to:
 
-```text
+``` text
 p ≈ 3 × 10^-9
 ```
 
 We will therefore use `3e-9` for this tutorial.
 
-> 💡 This does **not** mean that `3e-9` is a universal HWE cutoff. The purpose is to learn how to inspect the distribution and identify unusually extreme deviations rather than automatically applying the same threshold to every dataset.
+> 💡 This does **not** mean that `3e-9` is a universal HWE cutoff. The
+> purpose is to learn how to inspect the distribution and identify
+> unusually extreme deviations rather than automatically applying the
+> same threshold to every dataset.
 
 ### Apply the HWE filter
 
-After reviewing the HWE distribution and identifying the breakoff point, apply the selected threshold:
+After reviewing the HWE distribution and identifying the breakoff point,
+apply the selected threshold:
 
-```bash
+``` bash
 plink \
     --cow \
     --bfile srd_qc \
@@ -463,24 +528,27 @@ plink \
     --out srd_qc_hwe
 ```
 
-`--hwe 3e-9` removes markers with very extreme deviation from Hardy-Weinberg equilibrium. We are not trying to remove every slight departure from HWE; we are mainly removing the tail of markers that look unusually problematic based on the HWE distribution.
+`--hwe 3e-9` removes markers with very extreme deviation from
+Hardy-Weinberg equilibrium. We are not trying to remove every slight
+departure from HWE; we are mainly removing the tail of markers that look
+unusually problematic based on the HWE distribution.
 
 ### Main output
 
-```text
+``` text
 srd_qc_hwe.bed
 srd_qc_hwe.bim
 srd_qc_hwe.fam
 srd_qc_hwe.log
 ```
 
----
+------------------------------------------------------------------------
 
 ## 3. PCA Calculation
 
 Calculate principal components from the post-HWE dataset.
 
-```bash
+``` bash
 plink \
     --cow \
     --bfile srd_qc_hwe \
@@ -488,16 +556,19 @@ plink \
     --out srd_pca
 ```
 
-PCA is calculated to summarize major patterns of genetic similarity and population structure in the dataset. This is important because hidden structure can confound GWAS and produce misleading association signals if not accounted for.
+PCA is calculated to summarize major patterns of genetic similarity and
+population structure in the dataset. This is important because hidden
+structure can confound GWAS and produce misleading association signals
+if not accounted for.
 
 ### Main output
 
-```text
+``` text
 srd_pca.eigenval
 srd_pca.eigenvec
 ```
 
----
+------------------------------------------------------------------------
 
 ## 4. PCA Scree Plot, Metadata PCA, Covariate Testing, and Export
 
@@ -510,31 +581,35 @@ This R section:
 - tests candidate covariates against the binary phenotype;
 - exports a covariate file for the GWAS models.
 
-We use this step to decide which non-genetic and structure-related variables may need to be carried forward into the GWAS models.
+We use this step to decide which non-genetic and structure-related
+variables may need to be carried forward into the GWAS models.
 
-We also focus mainly on **PC1 and PC2** because they usually explain the largest share of the structure, and in this tutorial they are selected based on the scree plot "elbow" idea — after the first few PCs, the additional variance explained starts to level off.
+We also focus mainly on **PC1 and PC2** because they usually explain the
+largest share of the structure, and in this tutorial they are selected
+based on the scree plot "elbow" idea — after the first few PCs, the
+additional variance explained starts to level off.
 
 Because this is a long block, save it as a script.
 
 Geany is preferred:
 
-```bash
+``` bash
 geany pca_covariates.R
 ```
 
 If you prefer the command line:
 
-```bash
+``` bash
 nano pca_covariates.R
 ```
 
 Paste the code below, save the file, and run it with:
 
-```bash
+``` bash
 Rscript pca_covariates.R
 ```
 
-```r
+``` r
 library(tidyverse)
 
 eigenvalues <- read.table("srd_pca.eigenval", header = FALSE)$V1
@@ -747,15 +822,16 @@ cat("Sire dummy variables:", ncol(sire_dummy), "\n")
 cat("Technician dummy variables:", ncol(technician_dummy), "\n")
 ```
 
-If you used an interactive R session instead of `Rscript`, exit without saving the workspace:
+If you used an interactive R session instead of `Rscript`, exit without
+saving the workspace:
 
-```r
+``` r
 q("no")    # You can also use Ctrl + d and when prompted to save workspace, type n.
 ```
 
 ### Main outputs
 
-```text
+``` text
 pca_scree_plot.png
 srd_pca_Sire.jpg
 srd_pca_Birth_Year.jpg
@@ -768,33 +844,41 @@ covariates.txt
 
 You can inspect the covariate test results directly in the terminal:
 
-```bash
+``` bash
 head covariate_statistical_tests.csv
 ```
+
 or open the results as a spreadsheet:
 
-```bash
+``` bash
 gnumeric covariate_statistical_tests.csv
 ```
-💡 Gnumeric is particularly useful here because the covariates, test statistics, and p-values are easier to compare when displayed as rows and columns.
 
-> 💡 **Why were Sire and Technician dummy-coded?** Their values are identifiers for categories, not continuous measurements. For example, a larger sire ID does not represent “more sire.” The exported `covariates.txt` therefore contains `n-1` indicator variables for Sire and Technician so that these effects can be modeled as categorical covariates in PLINK. PC1, PC2, Birth Year, and Birth Year Group remain available as numeric covariates.
+💡 Gnumeric is particularly useful here because the covariates, test
+statistics, and p-values are easier to compare when displayed as rows
+and columns.
+
+> 💡 **Why were Sire and Technician dummy-coded?** Their values are
+> identifiers for categories, not continuous measurements. For example,
+> a larger sire ID does not represent “more sire.” The exported
+> `covariates.txt` therefore contains `n-1` indicator variables for Sire
+> and Technician so that these effects can be modeled as categorical
+> covariates in PLINK. PC1, PC2, Birth Year, and Birth Year Group remain
+> available as numeric covariates.
 
 You can inspect the exported covariate columns with:
 
-```bash
+``` bash
 head -n 1 covariates.txt | tr '\t' '\n'
 ```
 
-
-
----
+------------------------------------------------------------------------
 
 ## 5. Enable Whole-Genome Testing: Autosomes + Chromosome X
 
 Create the dataset used for the association models.
 
-```bash
+``` bash
 plink \
     --bfile srd_qc_hwe \
     --autosome-num 30 \
@@ -803,7 +887,10 @@ plink \
     --out srd_qc_allchr
 ```
 
-This step prepares the genotype data for whole-genome association testing. `--autosome-num 30` tells PLINK how to handle the chromosome numbering scheme in this dataset, and `--allow-extra-chr` helps PLINK tolerate nonstandard chromosome coding beyond the usual human defaults.
+This step prepares the genotype data for whole-genome association
+testing. `--autosome-num 30` tells PLINK how to handle the chromosome
+numbering scheme in this dataset, and `--allow-extra-chr` helps PLINK
+tolerate nonstandard chromosome coding beyond the usual human defaults.
 
 Wait, why did it work 😲? Something looks different here, what is it? 🤔
 
@@ -812,36 +899,41 @@ Wait, why did it work 😲? Something looks different here, what is it? 🤔
 
 <video src="https://github.com/user-attachments/assets/5ac3ef17-9b6f-49af-b706-ac3de99d2182" controls autoplay loop playsinline preload="auto" width="100%"></video>
 
-<sub><i>Source: <a href="https://www.tiktok.com/t/ZTUFuSbBq">TikTok</a></i></sub>
+<sub><i>Source:
+<a href="https://www.tiktok.com/t/ZTUFuSbBq">TikTok</a></i></sub>
 
 </details>
 
 ### Main output
 
-```text
+``` text
 srd_qc_allchr.bed
 srd_qc_allchr.bim
 srd_qc_allchr.fam
 ```
 
----
+------------------------------------------------------------------------
 
 ## 6. Flexible Association Testing
 
-For the **in-class exercise**, we will keep the GWAS focused and run only the **additive model** for two configurations:
+For the **in-class exercise**, we will keep the GWAS focused and run
+only the **additive model** for two configurations:
 
-1. **Unadjusted**
-2. **PC1 + PC2 adjusted**
+1.  **Unadjusted**
+2.  **PC1 + PC2 adjusted**
 
-This gives us a direct comparison between a GWAS with no covariate adjustment and a GWAS adjusted for the major population-structure axes selected from the PCA.
+This gives us a direct comparison between a GWAS with no covariate
+adjustment and a GWAS adjusted for the major population-structure axes
+selected from the PCA.
 
-Later, the same script can be used to run additional covariates, custom combinations, and different inheritance models.
+Later, the same script can be used to run additional covariates, custom
+combinations, and different inheritance models.
 
 ### Covariate menu
 
 The script will present this menu:
 
-```text
+``` text
 Choose covariate configuration(s):
 
 1. Unadjusted
@@ -870,7 +962,7 @@ Enter selection:
 
 The inheritance-model menu is:
 
-```text
+``` text
 Choose inheritance model(s):
 
 1. Additive
@@ -885,52 +977,55 @@ Enter selection:
 
 The punctuation has an important meaning:
 
-```text
+``` text
 ,  = separate GWAS analyses
 +  = covariates combined in the same GWAS analysis
 ```
 
 Examples:
 
-| Entry | Meaning |
-|---|---|
-| `1` | Unadjusted only |
-| `1,2` | Unadjusted and PC1 as two separate analyses |
-| `2+3` | PC1 + PC2 in the same model |
-| `6+5` | Birth Year + Sire in the same model |
+| Entry       | Meaning                                                  |
+|-------------|----------------------------------------------------------|
+| `1`         | Unadjusted only                                          |
+| `1,2`       | Unadjusted and PC1 as two separate analyses              |
+| `2+3`       | PC1 + PC2 in the same model                              |
+| `6+5`       | Birth Year + Sire in the same model                      |
 | `1,2+3,6+5` | Three analyses: Unadjusted; PC1 + PC2; Birth Year + Sire |
-| `ALL` | Run predefined configurations 1-9 separately |
+| `ALL`       | Run predefined configurations 1-9 separately             |
 
-> ⚠️ **Unadjusted cannot be combined with another covariate.** For example, `1+2` does not make sense because once PC1 is added, the model is no longer unadjusted.
+> ⚠️ **Unadjusted cannot be combined with another covariate.** For
+> example, `1+2` does not make sense because once PC1 is added, the
+> model is no longer unadjusted.
 
 The predefined combinations are provided for convenience:
 
-```text
+``` text
 4 = PC1 + PC2
 9 = Birth Year + Sire
 ```
 
-Therefore, `4` and `2+3` describe the same covariate adjustment, while `9` and `6+5` describe the same adjustment.
+Therefore, `4` and `2+3` describe the same covariate adjustment, while
+`9` and `6+5` describe the same adjustment.
 
----
+------------------------------------------------------------------------
 
 ### Create the flexible GWAS script
 
 Open a new script:
 
-```bash
+``` bash
 geany run_gwas.sh
 ```
 
 or:
 
-```bash
+``` bash
 nano run_gwas.sh
 ```
 
 Paste:
 
-```bash
+``` bash
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -1217,7 +1312,7 @@ fi
 
 Save the script, then make it executable:
 
-```bash
+``` bash
 chmod +x run_gwas.sh
 ```
 
@@ -1225,81 +1320,87 @@ chmod +x run_gwas.sh
 
 For the classroom exercise, run:
 
-```bash
+``` bash
 ./run_gwas.sh
 ```
 
 At the covariate prompt enter:
 
-```text
+``` text
 1,4
 ```
 
 Remember that the comma means **two separate GWAS analyses**:
 
-```text
+``` text
 1 = Unadjusted
 4 = PC1 + PC2
 ```
 
 At the inheritance-model prompt enter:
 
-```text
+``` text
 1
 ```
 
 which means:
 
-```text
+``` text
 Additive only
 ```
 
 Therefore, the in-class analysis produces only:
 
-```text
+``` text
 gwas_unadjusted_ADD.assoc.logistic
 gwas_pc1_pc2_ADD.assoc.logistic
 ```
 
-This is intentional. The goal during class is to compare the **unadjusted additive GWAS** against the **PC1 + PC2 adjusted additive GWAS** without generating dozens of additional files.
+This is intentional. The goal during class is to compare the
+**unadjusted additive GWAS** against the **PC1 + PC2 adjusted additive
+GWAS** without generating dozens of additional files.
 
 ### What is `gwas_run_manifest.tsv`?
 
-Every time the script runs, it records the analyses that were actually performed in:
+Every time the script runs, it records the analyses that were actually
+performed in:
 
-```text
+``` text
 gwas_run_manifest.tsv
 ```
 
 For the classroom run, it should look approximately like:
 
-```text
+``` text
 PREFIX                 TAG         TITLE        MODEL      TEST_ID
 gwas_unadjusted_ADD     unadjusted  Unadjusted   Additive   ADD
 gwas_pc1_pc2_ADD        pc1_pc2     PC1 + PC2    Additive   ADD
 ```
 
-This manifest is important because the plotting script will read it automatically. You therefore do **not** need to edit the plotting script every time you choose a different covariate or covariate combination.
+This manifest is important because the plotting script will read it
+automatically. You therefore do **not** need to edit the plotting script
+every time you choose a different covariate or covariate combination.
 
 ### Quickly inspect the two in-class GWAS results
 
-```bash
+``` bash
 head gwas_unadjusted_ADD.assoc.logistic
 ```
 
 and:
 
-```bash
+``` bash
 head gwas_pc1_pc2_ADD.assoc.logistic
 ```
 
 If you specifically want to view only the additive SNP-test rows:
 
-```bash
+``` bash
 awk 'NR==1 || $5=="ADD"' gwas_unadjusted_ADD.assoc.logistic | head
 ```
 
-The association output contains marker-level results. Important columns include:
+The association output contains marker-level results. Important columns
+include:
 
 - `CHR` = chromosome
 - `SNP` = marker name
@@ -1311,31 +1412,32 @@ The association output contains marker-level results. Important columns include:
 - `STAT` = test statistic
 - `P` = p-value
 
----
+------------------------------------------------------------------------
 
 ### 🏠 Homework / later analysis
 
 After you understand the in-class comparison, rerun:
 
-```bash
+``` bash
 ./run_gwas.sh
 ```
 
 For the covariate selection, enter:
 
-```text
+``` text
 ALL
 ```
 
 For the inheritance model, enter:
 
-```text
+``` text
 ALL
 ```
 
-This runs **each predefined covariate configuration 1-9 separately** under:
+This runs **each predefined covariate configuration 1-9 separately**
+under:
 
-```text
+``` text
 Additive
 Dominant
 Recessive
@@ -1343,7 +1445,7 @@ Recessive
 
 The predefined configurations are:
 
-```text
+``` text
 1. Unadjusted
 2. PC1
 3. PC2
@@ -1355,35 +1457,62 @@ The predefined configurations are:
 9. Birth Year + Sire
 ```
 
-Thus, `ALL` includes both of the combined presets you will want to compare later:
+Thus, `ALL` includes both of the combined presets you will want to
+compare later:
 
-```text
+``` text
 PC1 + PC2
 Birth Year + Sire
 ```
 
-> 💡 `ALL` does **not** generate every mathematically possible covariate combination. It runs the nine predefined configurations above as separate analyses. If you want a different custom combination, specify it explicitly with `+`, such as `2+5` for PC1 + Sire.
-
+> 💡 `ALL` does **not** generate every mathematically possible covariate
+> combination. It runs the nine predefined configurations above as
+> separate analyses. If you want a different custom combination, specify
+> it explicitly with `+`, such as `2+5` for PC1 + Sire.
 
 ## 7. Generate Standalone Manhattan and Q-Q Plots
 
-This section generates:
+This section generates Manhattan and Q-Q plots for the GWAS analyses you
+completed.
 
-- FDR Manhattan plots with a red dashed line at `FDR < 0.05`;
-- nominal Manhattan plots with a red dashed line at `p < 1e-5`;
-- Q-Q plots with genomic inflation (`lambda`) displayed on each plot.
+For the Manhattan plots, the script will ask which significance scale
+you want to use:
 
-The plotting script is intentionally **not hard-coded to a fixed list of covariates**. Instead, it reads:
+``` text
+Choose Manhattan plot type(s):
 
-```text
+1. Nominal (p < 1e-5)
+2. FDR (FDR < 0.05)
+3. Both
+
+Enter selection [use 1,2 or 3 for both]:
+```
+
+You can therefore choose:
+
+- `1` = nominal Manhattan plots only, using a red dashed line at
+  `p < 1e-5`;
+- `2` = FDR Manhattan plots only, using a red dashed line at
+  `FDR < 0.05`;
+- `3` = both nominal and FDR Manhattan plots;
+- `1,2` = also generates both nominal and FDR Manhattan plots.
+
+The Q-Q plot is generated automatically for every completed GWAS run
+regardless of the Manhattan option selected.
+
+The plotting script is intentionally **not hard-coded to a fixed list of
+covariates**. Instead, it reads:
+
+``` text
 gwas_run_manifest.tsv
 ```
 
-and plots whatever GWAS analyses were actually generated by `run_gwas.sh`.
+and plots whatever GWAS analyses were actually generated by
+`run_gwas.sh`.
 
 This means the same R script works for:
 
-```text
+``` text
 Unadjusted
 PC1
 PC2
@@ -1399,25 +1528,25 @@ Save the plotting code as an R script.
 
 Geany option:
 
-```bash
+``` bash
 geany gwas_plots.R
 ```
 
 Command-line option:
 
-```bash
+``` bash
 nano gwas_plots.R
 ```
 
 Run it with:
 
-```bash
+``` bash
 Rscript gwas_plots.R
 ```
 
 Paste:
 
-```r
+``` r
 library(tidyverse)
 library(scales)
 
@@ -1585,6 +1714,40 @@ print(runs)
 cat("\n")
 
 # ------------------------------------------------------------
+# Ask which Manhattan plot type(s) to generate
+# ------------------------------------------------------------
+cat("\nChoose Manhattan plot type(s):\n\n")
+cat("1. Nominal (p < 1e-5)\n")
+cat("2. FDR (FDR < 0.05)\n")
+cat("3. Both\n\n")
+
+manhattan_choice <- trimws(
+  readline("Enter selection [use 1,2 or 3 for both]: ")
+)
+
+manhattan_tokens <- trimws(
+  unlist(strsplit(manhattan_choice, ",", fixed = TRUE))
+)
+
+if (length(manhattan_tokens) == 0 ||
+    any(!manhattan_tokens %in% c("1", "2", "3"))) {
+  stop("Invalid Manhattan selection. Use 1, 2, 3, or 1,2.")
+}
+
+# Option 3 is simply a shortcut for selecting both 1 and 2.
+if ("3" %in% manhattan_tokens) {
+  manhattan_tokens <- unique(c(manhattan_tokens, "1", "2"))
+}
+
+make_nominal <- "1" %in% manhattan_tokens
+make_fdr     <- "2" %in% manhattan_tokens
+
+cat("\nManhattan plots selected:\n")
+if (make_nominal) cat("  - Nominal: p < 1e-5\n")
+if (make_fdr)     cat("  - FDR: FDR < 0.05\n")
+cat("\nQ-Q plots will also be generated automatically.\n\n")
+
+# ------------------------------------------------------------
 # Plot every completed GWAS listed in the manifest
 # ------------------------------------------------------------
 for (i in seq_len(nrow(runs))) {
@@ -1613,21 +1776,25 @@ for (i in seq_len(nrow(runs))) {
 
   model_short <- tolower(substr(r$MODEL, 1, 3))
 
-  plot_single_manhattan(
-    df_model = df,
-    model_name = r$MODEL,
-    run_title = r$TITLE,
-    out_png = paste0("manhattan_fdr_", r$TAG, "_", model_short, ".png"),
-    mode = "FDR"
-  )
+  if (make_nominal) {
+    plot_single_manhattan(
+      df_model = df,
+      model_name = r$MODEL,
+      run_title = r$TITLE,
+      out_png = paste0("manhattan_nominal_", r$TAG, "_", model_short, ".png"),
+      mode = "Nominal"
+    )
+  }
 
-  plot_single_manhattan(
-    df_model = df,
-    model_name = r$MODEL,
-    run_title = r$TITLE,
-    out_png = paste0("manhattan_nominal_", r$TAG, "_", model_short, ".png"),
-    mode = "Nominal"
-  )
+  if (make_fdr) {
+    plot_single_manhattan(
+      df_model = df,
+      model_name = r$MODEL,
+      run_title = r$TITLE,
+      out_png = paste0("manhattan_fdr_", r$TAG, "_", model_short, ".png"),
+      mode = "FDR"
+    )
+  }
 
   plot_single_qq(
     pvals = df$P,
@@ -1640,24 +1807,47 @@ for (i in seq_len(nrow(runs))) {
 
 ### In-class plot outputs
 
-Because the classroom GWAS contains only the two additive runs, the plotting script will initially create:
+Because the classroom GWAS contains only the two additive runs, the
+plotting script will ask which Manhattan plot type you want to generate.
 
-```text
-manhattan_fdr_unadjusted_add.png
+If you enter:
+
+``` text
+3
+```
+
+or:
+
+``` text
+1,2
+```
+
+both nominal and FDR Manhattan plots will be generated, together with
+the Q-Q plots:
+
+``` text
 manhattan_nominal_unadjusted_add.png
+manhattan_fdr_unadjusted_add.png
 qq_unadjusted_add.png
 
-manhattan_fdr_pc1_pc2_add.png
 manhattan_nominal_pc1_pc2_add.png
+manhattan_fdr_pc1_pc2_add.png
 qq_pc1_pc2_add.png
 ```
 
+If you select only `1`, only the nominal Manhattan plots will be
+produced. If you select only `2`, only the FDR Manhattan plots will be
+produced. The Q-Q plots are always generated.
+
 View the Q-Q plots side by side conceptually and ask:
 
-1. How does the unadjusted Q-Q plot differ from the PC1 + PC2 adjusted Q-Q plot?
-2. What happens to genomic inflation (`lambda`)?
-3. Do the strongest Manhattan-plot signals remain similar after PC adjustment?
-4. Does adjustment appear to reduce broad inflation, or does it appear overly conservative?
+1.  How does the unadjusted Q-Q plot differ from the PC1 + PC2 adjusted
+    Q-Q plot?
+2.  What happens to genomic inflation (`lambda`)?
+3.  Do the strongest Manhattan-plot signals remain similar after PC
+    adjustment?
+4.  Does adjustment appear to reduce broad inflation, or does it appear
+    overly conservative?
 
 ### Later plots: PC1 alone, PC2 alone, and other combinations
 
@@ -1665,41 +1855,46 @@ No new R code is required.
 
 For example, if you rerun `run_gwas.sh` and select:
 
-```text
+``` text
 2,3,4
 ```
 
 with:
 
-```text
+``` text
 1
 ```
 
-for the additive inheritance model, the manifest will contain PC1, PC2, and PC1 + PC2 as separate runs. Running:
+for the additive inheritance model, the manifest will contain PC1, PC2,
+and PC1 + PC2 as separate runs. Running:
 
-```bash
+``` bash
 Rscript gwas_plots.R
 ```
 
-will then automatically generate Manhattan and Q-Q plots for all three.
+will then ask whether you want nominal Manhattan plots, FDR Manhattan
+plots, or both. It will generate the selected Manhattan plot type(s) and
+the Q-Q plots for all three GWAS runs.
 
 Similarly, a custom selection such as:
 
-```text
+``` text
 6+5
 ```
 
-will generate a Birth Year + Sire GWAS and the plotting script will automatically produce the corresponding figures.
+will generate a Birth Year + Sire GWAS and the plotting script will
+automatically produce the corresponding figures.
 
-> 💡 The plotting script follows the manifest. If you change the GWAS selection, rerun `Rscript gwas_plots.R` after the GWAS has completed.
+> 💡 The plotting script follows the manifest. If you change the GWAS
+> selection, rerun `Rscript gwas_plots.R` after the GWAS has completed.
 
----
+------------------------------------------------------------------------
 
 ## 🧠 What have we done in this tutorial?
 
 You have now worked through the major steps of a complete GWAS workflow:
 
-```text
+``` text
 Raw PED/MAP genotype data
         ↓
 Initial SNP and animal QC
@@ -1728,7 +1923,8 @@ More specifically, you learned how to:
 - inspect genotype and metadata files before analysis;
 - apply call-rate and minor-allele-frequency QC filters;
 - calculate and visualize HWE statistics;
-- use the observed HWE distribution to identify an extreme-deviation tail;
+- use the observed HWE distribution to identify an extreme-deviation
+  tail;
 - calculate principal components to describe population structure;
 - visualize metadata variables on the PCA;
 - test potential covariates against the phenotype;
@@ -1737,43 +1933,60 @@ More specifically, you learned how to:
 - compare an unadjusted model against a PC-adjusted model;
 - calculate FDR-adjusted p-values and genomic inflation (`lambda`);
 - generate Manhattan and Q-Q plots;
-- use a flexible GWAS script to construct additional covariate models without rewriting the analysis code.
+- use a flexible GWAS script to construct additional covariate models
+  without rewriting the analysis code.
 
-The **in-class analysis deliberately stops at two additive models** so that the focus remains on understanding what covariate adjustment does. The homework extends the same workflow across the predefined covariate configurations and additive, dominant, and recessive inheritance models.
+The **in-class analysis deliberately stops at two additive models** so
+that the focus remains on understanding what covariate adjustment does.
+The homework extends the same workflow across the predefined covariate
+configurations and additive, dominant, and recessive inheritance models.
 
----
-
+------------------------------------------------------------------------
 
 ## Quick command summary
 
-| Step | Main command/script | Main output |
-|---|---|---|
-| Initial QC | `plink --file ... --maf --geno --mind --make-bed` | `srd_qc.*` |
-| HWE calculation | `plink --bfile srd_qc --hardy` | `plink_results_hwinb.hwe` |
-| HWE plots | `Rscript hwe_plots.R` | `hwe_distribution_plots.png` |
-| HWE filtering | `plink --bfile srd_qc --hwe 3e-9 --make-bed` | `srd_qc_hwe.*` |
-| PCA | `plink --bfile srd_qc_hwe --pca` | `srd_pca.eigenval`, `srd_pca.eigenvec` |
-| PCA/covariates | `Rscript pca_covariates.R` | PCA plots, `covariates.txt` |
-| Whole-genome dataset | `plink ... --autosome-num 30 ...` | `srd_qc_allchr.*` |
-| Flexible GWAS | `./run_gwas.sh` | `.assoc.logistic` files + `gwas_run_manifest.tsv` |
-| In-class GWAS | Covariates `1,4`; model `1` | Unadjusted ADD + PC1/PC2 ADD |
-| Homework GWAS | Covariates `ALL`; model `ALL` | Presets 1-9 × ADD/DOM/REC |
-| Manhattan/Q-Q plots | `Rscript gwas_plots.R` | `.png` plots for runs in the manifest |
+| Step                 | Main command/script                               | Main output                                       |
+|----------------------|---------------------------------------------------|---------------------------------------------------|
+| Initial QC           | `plink --file ... --maf --geno --mind --make-bed` | `srd_qc.*`                                        |
+| HWE calculation      | `plink --bfile srd_qc --hardy`                    | `plink_results_hwinb.hwe`                         |
+| HWE plots            | `Rscript hwe_plots.R`                             | `hwe_distribution_plots.png`                      |
+| HWE filtering        | `plink --bfile srd_qc --hwe 3e-9 --make-bed`      | `srd_qc_hwe.*`                                    |
+| PCA                  | `plink --bfile srd_qc_hwe --pca`                  | `srd_pca.eigenval`, `srd_pca.eigenvec`            |
+| PCA/covariates       | `Rscript pca_covariates.R`                        | PCA plots, `covariates.txt`                       |
+| Whole-genome dataset | `plink ... --autosome-num 30 ...`                 | `srd_qc_allchr.*`                                 |
+| Flexible GWAS        | `./run_gwas.sh`                                   | `.assoc.logistic` files + `gwas_run_manifest.tsv` |
+| In-class GWAS        | Covariates `1,4`; model `1`                       | Unadjusted ADD + PC1/PC2 ADD                      |
+| Homework GWAS        | Covariates `ALL`; model `ALL`                     | Presets 1-9 × ADD/DOM/REC                         |
+| Manhattan/Q-Q plots  | `Rscript gwas_plots.R`                            | `.png` plots for runs in the manifest             |
 
 ## Notes for students ✍️📖
 
-- Run commands from your own `~/workshop` directory so your output files stay separate from other students' work.
-- Read the PLINK `.log` file after every major PLINK command. It records how many animals and SNPs were loaded, removed, and retained.
-- Do not delete intermediate files until the workflow is complete; later steps depend on several of them.
-- Remember: a comma in the GWAS menu means **separate analyses**, while `+` means **covariates included together in one model**.
-- `ALL` runs the nine predefined covariate configurations separately; it does not generate every possible combination.
-- The classroom GWAS uses **additive only** for **Unadjusted** and **PC1 + PC2**.
-- If you use **Geany**, it is a nice lightweight editor and easier for most people to navigate visually.
-- If you use **nano**, it is usually faster if you are already comfortable in the terminal.
-- If an R script stops with an error, read the **first** error message before rerunning the script. Later errors may simply be consequences of the first one.
-- When comparing Q-Q plots, do not judge a model only by whether points are above or below the diagonal. Consider the overall pattern, genomic inflation (`lambda`), sample size, and whether covariate adjustment is biologically/statistically justified.
+- Run commands from your own `~/workshop` directory so your output files
+  stay separate from other students' work.
+- Read the PLINK `.log` file after every major PLINK command. It records
+  how many animals and SNPs were loaded, removed, and retained.
+- Do not delete intermediate files until the workflow is complete; later
+  steps depend on several of them.
+- Remember: a comma in the GWAS menu means **separate analyses**, while
+  `+` means **covariates included together in one model**.
+- `ALL` runs the nine predefined covariate configurations separately; it
+  does not generate every possible combination.
+- The classroom GWAS uses **additive only** for **Unadjusted** and
+  **PC1 + PC2**.
+- If you use **Geany**, it is a nice lightweight editor and easier for
+  most people to navigate visually.
+- If you use **nano**, it is usually faster if you are already
+  comfortable in the terminal.
+- If an R script stops with an error, read the **first** error message
+  before rerunning the script. Later errors may simply be consequences
+  of the first one.
+- When comparing Q-Q plots, do not judge a model only by whether points
+  are above or below the diagonal. Consider the overall pattern, genomic
+  inflation (`lambda`), sample size, and whether covariate adjustment is
+  biologically/statistically justified.
 
 ## The End! :grin: :clap:
+
 <p align="center">
   <img src="images/celebrate.gif" width="1000" alt="Tutorial Overview" />
   <br>
