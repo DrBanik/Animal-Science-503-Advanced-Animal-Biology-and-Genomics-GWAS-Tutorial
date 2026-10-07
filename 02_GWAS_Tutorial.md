@@ -646,8 +646,8 @@ metadata <- read.csv("/workshop/data/SRD_HFL_AI_50K_metadata.csv", stringsAsFact
 
 metadata <- metadata %>%
   mutate(
-    Birth_Year_Label = ifelse(as.numeric(Birth_Year) >= 2020, "Post-2020", "Pre-2020"),
-    Birth_Year_Group = ifelse(as.numeric(Birth_Year) >= 2020, 2, 1)
+    Birth_Group_Label = ifelse(as.numeric(Birth_Year) >= 2020, "Post-2020", "Pre-2020"),
+    Birth_Group = ifelse(as.numeric(Birth_Year) >= 2020, 2, 1)
   )
 
 fam_data <- read.table("srd_qc_hwe.fam", header = FALSE)[, c(1, 2, 6)]
@@ -666,7 +666,7 @@ plot_data <- inner_join(pca_data, metadata, by = c("IID" = "SampleID")) %>%
 variables_to_plot <- list(
   "Sire"              = "Sire ID",
   "Birth_Year"        = "Birth Year",
-  "Birth_Year_Label"  = "Birth Year Grouping (Pre vs Post 2020)",
+  "Birth_Group_Label"  = "Birth Group (Pre vs Post 2020)",
   "Technician"        = "Technician ID",
   "Protocol"          = "Protocol"
 )
@@ -692,7 +692,7 @@ for (var_name in names(variables_to_plot)) {
       panel.grid.minor = element_blank()
     )
 
-  out_name <- ifelse(var_name == "Birth_Year_Label", "srd_pca_Birth_Year_Group.jpg", paste0("srd_pca_", var_name, ".jpg"))
+  out_name <- ifelse(var_name == "Birth_Group_Label", "srd_pca_Birth_Group.jpg", paste0("srd_pca_", var_name, ".jpg"))
 
   ggsave(
     filename = out_name,
@@ -703,7 +703,7 @@ for (var_name in names(variables_to_plot)) {
   )
 }
 
-test_vars <- c("Birth_Year", "Birth_Year_Group", "Technician", "Sire", "Protocol", "PC1", "PC2", "PC3")
+test_vars <- c("Birth_Year", "Birth_Group", "Technician", "Sire", "Protocol", "PC1", "PC2", "PC3")
 
 covar_results <- list()
 
@@ -761,18 +761,18 @@ cat("P-value:", signif(lrt_pcs$`Pr(>Chi)`[2], 4), "\n\n")
 # ------------------------------------------------------------------
 # Prepare the covariate file used by PLINK
 # ------------------------------------------------------------------
-# PC1, PC2, Birth Year, and Birth Year Group are retained as numeric
+# PC1, PC2, Birth Year, and Birth Group are retained as numeric
 # covariates. Sire and Technician are categorical identifiers, so we
 # convert them to n-1 dummy variables before exporting the file.
 
 covar_base <- inner_join(
   pca_data[, c("FID", "IID", "PC1", "PC2")],
-  plot_data[, c("IID", "Birth_Year", "Birth_Year_Group", "Technician", "Sire")],
+  plot_data[, c("IID", "Birth_Year", "Birth_Group", "Technician", "Sire")],
   by = "IID"
 ) %>%
   mutate(
     Birth_Year = as.numeric(as.character(Birth_Year)),
-    Birth_Year_Group = as.numeric(as.character(Birth_Year_Group))
+    Birth_Group = as.numeric(as.character(Birth_Group))
   )
 
 make_dummy_block <- function(x, prefix) {
@@ -803,7 +803,7 @@ technician_dummy <- make_dummy_block(covar_base$Technician, "Technician")
 
 covar_df <- bind_cols(
   covar_base %>%
-    select(FID, IID, PC1, PC2, Birth_Year, Birth_Year_Group),
+    select(FID, IID, PC1, PC2, Birth_Year, Birth_Group),
   sire_dummy,
   technician_dummy
 )
@@ -835,7 +835,7 @@ q("no")    # You can also use Ctrl + d and when prompted to save workspace, type
 pca_scree_plot.png
 srd_pca_Sire.jpg
 srd_pca_Birth_Year.jpg
-srd_pca_Birth_Year_Group.jpg
+srd_pca_Birth_Group.jpg
 srd_pca_Technician.jpg
 srd_pca_Protocol.jpg
 covariate_statistical_tests.csv
@@ -863,7 +863,7 @@ and columns.
 > a larger sire ID does not represent “more sire.” The exported
 > `covariates.txt` therefore contains `n-1` indicator variables for Sire
 > and Technician so that these effects can be modeled as categorical
-> covariates in PLINK. PC1, PC2, Birth Year, and Birth Year Group remain
+> covariates in PLINK. PC1, PC2, Birth Year, and Birth Group remain
 > available as numeric covariates.
 
 You can inspect the exported covariate columns with:
@@ -942,7 +942,7 @@ Choose covariate configuration(s):
 4. PC1 + PC2
 5. Sire
 6. Birth Year
-7. Birth Year Group
+7. Birth Group
 8. Technician
 9. Birth Year + Sire
 10. ALL
@@ -1058,7 +1058,7 @@ echo "3. PC2"
 echo "4. PC1 + PC2"
 echo "5. Sire"
 echo "6. Birth Year"
-echo "7. Birth Year Group"
+echo "7. Birth Group"
 echo "8. Technician"
 echo "9. Birth Year + Sire"
 echo "10. ALL"
@@ -1115,7 +1115,7 @@ expand_choice() {
         4) echo "PC1 PC2" ;;
         5) echo "Sire" ;;
         6) echo "Birth_Year" ;;
-        7) echo "Birth_Year_Group" ;;
+        7) echo "Birth_Group" ;;
         8) echo "Technician" ;;
         9) echo "Birth_Year Sire" ;;
         *)
@@ -1168,7 +1168,7 @@ for spec in "${COV_SPECS[@]}"; do
     else
         unique_covars=()
 
-        for candidate in PC1 PC2 Birth_Year Birth_Year_Group Technician Sire; do
+        for candidate in PC1 PC2 Birth_Year Birth_Group Technician Sire; do
             for x in "${abstract_covars[@]}"; do
                 if [ "$x" = "$candidate" ]; then
                     already=0
@@ -1206,10 +1206,10 @@ for spec in "${COV_SPECS[@]}"; do
                     title_parts+=("Birth Year")
                     plink_cols+=("Birth_Year")
                     ;;
-                Birth_Year_Group)
-                    tag_parts+=("birth_year_group")
-                    title_parts+=("Birth Year Group")
-                    plink_cols+=("Birth_Year_Group")
+                Birth_Group)
+                    tag_parts+=("birth_group")
+                    title_parts+=("Birth Group")
+                    plink_cols+=("Birth_Group")
                     ;;
                 Technician)
                     if [ -z "$TECH_COLS" ]; then
@@ -1452,7 +1452,7 @@ The predefined configurations are:
 4. PC1 + PC2
 5. Sire
 6. Birth Year
-7. Birth Year Group
+7. Birth Group
 8. Technician
 9. Birth Year + Sire
 ```
