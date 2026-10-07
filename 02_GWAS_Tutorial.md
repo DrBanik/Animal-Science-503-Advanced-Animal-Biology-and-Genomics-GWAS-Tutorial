@@ -1500,6 +1500,10 @@ You can therefore choose:
 The Q-Q plot is generated automatically for every completed GWAS run
 regardless of the Manhattan option selected.
 
+> **Note:** The plotting script uses `readLines(stdin())` for this menu
+> so that the prompt works when the script is launched with
+> `Rscript gwas_plots.R`.
+
 The plotting script is intentionally **not hard-coded to a fixed list of
 covariates**. Instead, it reads:
 
@@ -1721,9 +1725,18 @@ cat("1. Nominal (p < 1e-5)\n")
 cat("2. FDR (FDR < 0.05)\n")
 cat("3. Both\n\n")
 
+cat("Enter selection [use 1,2 or 3 for both]: ")
+flush.console()
+
+# readLines(stdin()) is used instead of readline() so the prompt works
+# when this script is run with: Rscript gwas_plots.R
 manhattan_choice <- trimws(
-  readline("Enter selection [use 1,2 or 3 for both]: ")
+  readLines(con = stdin(), n = 1, warn = FALSE)
 )
+
+if (length(manhattan_choice) == 0 || manhattan_choice == "") {
+  stop("No Manhattan selection entered. Use 1, 2, 3, or 1,2.")
+}
 
 manhattan_tokens <- trimws(
   unlist(strsplit(manhattan_choice, ",", fixed = TRUE))
