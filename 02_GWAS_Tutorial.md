@@ -476,7 +476,7 @@ If the image is too large, play around with the `--zoom` flag to fit
 your desired viewing %. Here, we use 50:
 
 ``` bash
-feh --zoom 50 hwe_distribution_plots.png
+feh --zoom 40 hwe_distribution_plots.png
 ```
 
 > 💡 If you have trouble viewing the plot, you can download the plot
