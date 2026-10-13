@@ -21,9 +21,9 @@ the bash and R environments.*</sub>
     **PC1 + PC2** configurations.
 7.  Generate matching Manhattan and Q-Q plots and compare the effect of
     population-structure adjustment.
-8.  Use the flexible GWAS script later to run individual covariates,
-    custom covariate combinations, or the full homework analysis across
-    additive, dominant, and recessive models.
+8.  For homework, test **PC1, Birth Year, and Birth Group** separately
+    under **additive, dominant, and recessive models** (9 GWAS runs total).
+    Other covariates remain available for optional exploration.
 
 ------------------------------------------------------------------------
 
@@ -172,8 +172,8 @@ As you inspect the first few rows, ask yourself:
 
 > 💡 We will explore several metadata variables during the PCA/covariate
 > section. The in-class GWAS will focus only on the **unadjusted** and
-> **PC1 + PC2** additive models, but the same workflow can later be used
-> with other covariates.
+> **PC1 + PC2** additive models. For the homework, you will compare
+> **PC1, Birth Year, and Birth Group** under all three inheritance models.
 
 ------------------------------------------------------------------------
 
@@ -926,8 +926,21 @@ This gives us a direct comparison between a GWAS with no covariate
 adjustment and a GWAS adjusted for the major population-structure axes
 selected from the PCA.
 
-Later, the same script can be used to run additional covariates, custom
-combinations, and different inheritance models.
+For the **homework**, we will focus on just three individual covariates:
+**PC1**, **Birth Year**, and **Birth Group** (Birth Years grouped as
+before 2020 vs 2020 onward). Each will be tested under **additive (ADD)**,
+**dominant (DOM)**, and **recessive (REC)** inheritance, giving **9 runs**.
+The script remains flexible if you wish to investigate other options.
+
+| Exercise | Covariate selection | Inheritance selection | Number of GWAS runs |
+|---|---|---|---:|
+| **In class** | **`1,4`** (Unadjusted; PC1 + PC2) | **`1`** (Additive only) | **2** |
+| **Homework** | **`2,6,7`** (PC1; Birth Year; Birth Group) | **`4`** (ADD, DOM, REC) | **9** |
+
+> **Use a comma, not a plus sign, for homework.** `2,6,7` runs
+> each covariate **separately**; `2+6+7` would fit them together in
+> a single GWAS model. The `4` in the **inheritance** menu means
+> all three inheritance models; it does **not** select all covariates.
 
 ### Covariate menu
 
@@ -974,6 +987,10 @@ Enter selection:
 ```
 
 ### How the selection syntax works
+
+**For this assignment, the important covariate menu numbers are:**
+`1,4` in class, and `2,6,7` for homework. Other options in the menu
+are not required for homework.
 
 The punctuation has an important meaning:
 
@@ -1072,6 +1089,8 @@ echo "Example: 6+5 = Birth Year + Sire."
 echo
 echo "ALL runs predefined configurations 1-9 separately."
 echo
+echo "For class: 1,4  |  For homework: 2,6,7"
+echo
 read -r -p "Enter selection: " COV_INPUT
 
 COV_INPUT=$(echo "$COV_INPUT" | tr -d ' ')
@@ -1094,6 +1113,8 @@ echo "1. Additive"
 echo "2. Dominant"
 echo "3. Recessive"
 echo "4. ALL"
+echo
+echo "For class: 1 (Additive only)  |  For homework: 4 (ADD, DOM, REC)"
 echo
 read -r -p "Enter selection: " MODEL_INPUT
 
@@ -1381,6 +1402,11 @@ This manifest is important because the plotting script will read it
 automatically. You therefore do **not** need to edit the plotting script
 every time you choose a different covariate or covariate combination.
 
+> **Important:** `run_gwas.sh` creates a **new manifest** each time you
+> run it. Complete the **in-class plotting** in Section 7 before rerunning
+> the GWAS script for homework, so the class plots and summary are generated
+> from the two class analyses.
+
 ### Quickly inspect the two in-class GWAS results
 
 ``` bash
@@ -1414,61 +1440,13 @@ include:
 
 ------------------------------------------------------------------------
 
-### 🏠 Homework / later analysis
+### Before starting homework
 
-After you understand the in-class comparison, rerun:
-
-``` bash
-./run_gwas.sh
-```
-
-For the covariate selection, enter:
-
-``` text
-ALL
-```
-
-For the inheritance model, enter:
-
-``` text
-ALL
-```
-
-This runs **each predefined covariate configuration 1-9 separately**
-under:
-
-``` text
-Additive
-Dominant
-Recessive
-```
-
-The predefined configurations are:
-
-``` text
-1. Unadjusted
-2. PC1
-3. PC2
-4. PC1 + PC2
-5. Sire
-6. Birth Year
-7. Birth Group
-8. Technician
-9. Birth Year + Sire
-```
-
-Thus, `ALL` includes both of the combined presets you will want to
-compare later:
-
-``` text
-PC1 + PC2
-Birth Year + Sire
-```
-
-> 💡 `ALL` does **not** generate every mathematically possible covariate
-> combination. It runs the nine predefined configurations above as
-> separate analyses. If you want a different custom combination, specify
-> it explicitly with `+`, such as `2+5` for PC1 + Sire.
+**Finish the in-class plotting exercise in Section 7 first.** After
+that, continue to the **Homework GWAS and plots** instructions later
+in Section 7, where you will use covariate choices **`2,6,7`** and
+inheritance-model choice **`4`**. You do **not** need to run all
+covariates for the assignment.
 
 ## 7. Generate Standalone Manhattan and Q-Q Plots
 
@@ -1482,16 +1460,19 @@ The summary file is:
 gwas_results_summary.tsv
 ```
 
-It contains one row for every GWAS run listed in
-`gwas_run_manifest.tsv`. Therefore, it automatically reflects only the
-covariates and inheritance models that were actually tested.
+The summary follows `gwas_run_manifest.tsv`, so it reflects the
+covariates and inheritance models you **actually selected**. Each run
+that produces valid SNP P-values receives one summary row.
 
-For example:
+- **In class:** `1,4` and model `1` → **2 GWAS runs** and typically **2 TSV rows**.
+- **Homework:** `2,6,7` and model `4` → **9 GWAS runs** and typically **9 TSV rows**.
+- **Optional exploration:** all nine predefined covariate configurations
+  under three inheritance models → **27 attempted runs**, although runs
+  with no valid SNP tests are skipped in the plots/summary.
 
-- if you run only Unadjusted Additive and PC1 + PC2 Additive, the TSV
-  will contain **2 rows**;
-- if you run all 9 predefined covariate configurations under Additive,
-  Dominant, and Recessive inheritance, the TSV will contain **27 rows**.
+A skipped analysis is **not** evidence that its covariate has no effect;
+it means no valid marker-level association statistics were available
+for that run.
 
 To keep the plotting step simple and interactive, we will use **two
 scripts**:
@@ -1548,22 +1529,10 @@ gwas_run_manifest.tsv
 so it plots **only the GWAS analyses that were actually run** by
 `run_gwas.sh`.
 
-For example, the same plotting scripts work whether the manifest
-contains:
-
-``` text
-Unadjusted
-PC1
-PC2
-PC1 + PC2
-Birth Year
-Birth Group
-Sire
-Technician
-Birth Year + Sire
-```
-
-or a smaller/custom set of analyses.
+For example, it will process just the **two in-class additive runs**
+when the manifest contains `Unadjusted` and `PC1 + PC2`. For homework,
+it will process the **nine runs** for `PC1`, `Birth Year`, and `Birth Group`
+under ADD, DOM, and REC. No plotting-code changes are needed.
 
 ------------------------------------------------------------------------
 
@@ -2157,8 +2126,8 @@ Manhattan plots:
 [1/2] Unadjusted | Additive
 ------------------------------------------------------------
   Reading: gwas_unadjusted_ADD.assoc.logistic
-  SNP rows: 49,850
-  Summary: N animals = 126 | N SNPs = 49,850 | lambdaGC = 1.012 | min P = 3.21e-06
+  SNP rows: 40,307
+  Summary: N animals = 126 | N SNPs = 40,307 | lambdaGC = 1.271 | min P = 5.74e-05
   Creating nominal Manhattan plot...
   DONE: manhattan_nominal_unadjusted_add.png
   Creating FDR Manhattan plot...
@@ -2171,8 +2140,8 @@ Manhattan plots:
 [2/2] PC1 + PC2 | Additive
 ------------------------------------------------------------
   Reading: gwas_pc1_pc2_ADD.assoc.logistic
-  SNP rows: 49,850
-  Summary: N animals = 126 | N SNPs = 49,850 | lambdaGC = 1.012 | min P = 3.21e-06
+  SNP rows: 40,307
+  Summary: N animals = 126 | N SNPs = 40,307 | lambdaGC = 0.998 | min P = 3.23e-05
   Creating nominal Manhattan plot...
   DONE: manhattan_nominal_pc1_pc2_add.png
   Creating FDR Manhattan plot...
@@ -2194,8 +2163,8 @@ Plot files are in:   /home/studentXX/workshop
 ============================================================
 ```
 
-The exact SNP count, lambda value, minimum P-value, and
-working-directory path will depend on the analysis.
+The values shown are from the example 126-animal teaching dataset;
+your results may differ if the input or filtering changes.
 
 ### GWAS summary TSV
 
@@ -2238,24 +2207,27 @@ or:
 head gwas_results_summary.tsv
 ```
 
-This summary is **dynamic**. It follows `gwas_run_manifest.tsv`, so no
-extra editing is needed when a different set of covariates or
-inheritance models is selected.
-
-If you run all nine predefined covariate configurations under all three
-inheritance models, the manifest contains **27 GWAS runs**. The TSV will
-also contain **27 result rows**, and the terminal will show:
+This summary is **dynamic**: it follows the current `gwas_run_manifest.tsv`.
+For the **required homework selection** (`2,6,7` with model `4`), the
+terminal should show **9 GWAS runs**, and—provided all runs have valid
+SNP P-values—the TSV will have **9 data rows**:
 
 ``` text
-[1/27] ...
-[2/27] ...
-[3/27] ...
-...
-[27/27] ...
+[1/9] PC1 | Additive
+[2/9] PC1 | Dominant
+[3/9] PC1 | Recessive
+[4/9] Birth Year | Additive
+[5/9] Birth Year | Dominant
+[6/9] Birth Year | Recessive
+[7/9] Birth Group | Additive
+[8/9] Birth Group | Dominant
+[9/9] Birth Group | Recessive
 ```
 
-so you can always tell which analysis is currently being plotted and how
-many remain.
+Check the reported **valid SNP counts** and **λGC** for each model. If
+one model has no valid P-values, the plotting script records it as
+**skipped**, and it will not appear in the current TSV. The TSV therefore
+may have fewer rows than the number of attempted runs.
 
 ------------------------------------------------------------------------
 
@@ -2301,53 +2273,97 @@ Compare the unadjusted and PC1 + PC2 adjusted results:
 
 ------------------------------------------------------------------------
 
-### Later plots: PC1 alone, PC2 alone, and other combinations
+### 🏠 Homework GWAS and plots: selected covariates only
 
-No new plotting code is required.
+Once you have completed the **two in-class additive analyses and their
+plots**, focus on **three covariate configurations** for the assignment:
 
-For example, if you rerun:
+| Covariate menu number | Covariate tested separately | Inheritance models |
+|---|---|---|
+| **`2`** | **PC1** | ADD, DOM, REC |
+| **`6`** | **Birth Year** | ADD, DOM, REC |
+| **`7`** | **Birth Group** (before 2020 vs 2020 onward) | ADD, DOM, REC |
+
+You will therefore run **3 covariate configurations × 3 inheritance
+models = 9 GWAS analyses**.
+
+**Step 1.** You can preserve the in-class results summary before
+running the homework analysis:
+
+``` bash
+cp gwas_results_summary.tsv gwas_results_summary_in_class.tsv
+cp gwas_run_manifest.tsv gwas_run_manifest_in_class.tsv
+```
+
+The original `.assoc.logistic` files and named PNG plots also remain
+available in your workshop directory.
+
+**Step 2.** Run the same flexible GWAS script:
 
 ``` bash
 ./run_gwas.sh
 ```
 
-and select:
+At **Choose covariate configuration(s)**, enter:
 
 ``` text
-2,3,4
+2,6,7
 ```
 
-with:
+This means **PC1**, **Birth Year**, and **Birth Group**, each tested
+**separately**. Do **not** use `2+6+7`, which would combine the variables
+in a single model.
+
+At **Choose inheritance model(s)**, enter:
 
 ``` text
-1
+4
 ```
 
-for the additive inheritance model, the manifest will contain PC1, PC2,
-and PC1 + PC2 as three separate GWAS runs.
+Here, **`4 = ALL` refers only to the inheritance models**, meaning
+**Additive, Dominant, and Recessive**. It does **not** mean all covariates.
 
-Then simply run:
+**Step 3.** Generate the plots and updated GWAS summary:
 
 ``` bash
 ./plot_gwas.sh
 ```
 
-and choose the Manhattan plot type(s). The plotting script will
-automatically process all three runs and show the progress for each one.
+Select the nominal, FDR, or both Manhattan plot types as described above;
+Q-Q plots are always generated. The current `gwas_run_manifest.tsv` and
+`gwas_results_summary.tsv` will correspond to **these nine homework
+analyses**, not the two earlier in-class analyses.
 
-Similarly, a custom GWAS selection such as:
+Use the TSV and Q-Q plots to compare the **λGC**, **valid number of SNPs**,
+and association results across ADD, DOM, and REC for each of the three
+required covariates. Check whether some models produce fewer valid SNP
+P-values than others.
 
-``` text
-6+5
-```
+> **Homework focus:** Only **`2,6,7`** (PC1, Birth Year, Birth Group)
+> with inheritance choice **`4`** (ADD, DOM, REC) is required. You do **not**
+> need to select all covariates for this assignment.
 
-will generate a Birth Year + Sire GWAS. The plotting workflow will
-automatically recognize it from the manifest and generate the
-corresponding figures.
+### Optional exploration: all covariates and other combinations
 
-> 💡 The plotting workflow follows the manifest. If you change the GWAS
-> selection and rerun `run_gwas.sh`, run `./plot_gwas.sh` afterward to
-> generate plots for the new set of completed analyses.
+If you are curious, you **may** explore more covariates for comparison.
+For example, rerun `./run_gwas.sh` and select `10` or `ALL` in the
+**covariate menu**, followed by `4` or `ALL` in the **inheritance menu**.
+This attempts **9 predefined covariate configurations × 3 models = 27
+GWAS runs**. This is **optional**, not part of the required homework.
+
+You may also choose other specific numbers, or use `+` to combine
+covariates in a single model (e.g., `2+3` for PC1 + PC2).
+
+Be aware that this small teaching dataset may not support stable
+association tests for covariates with many categorical levels, especially
+**Sire**. Some optional runs may produce `NA` SNP P-values and therefore
+cannot be plotted or summarized with λGC. Always inspect the PLINK
+`.log` and `.assoc.logistic` files before interpreting those runs.
+
+> 💡 Each time you rerun `run_gwas.sh`, it creates a new
+> `gwas_run_manifest.tsv`; running `plot_gwas.sh` again updates the
+> `gwas_results_summary.tsv` for that manifest. Save a copy if you want
+> to retain a previous summary.
 
 ------------------------------------------------------------------------
 
@@ -2399,8 +2415,9 @@ More specifically, you learned how to:
 
 The **in-class analysis deliberately stops at two additive models** so
 that the focus remains on understanding what covariate adjustment does.
-The homework extends the same workflow across the predefined covariate
-configurations and additive, dominant, and recessive inheritance models.
+The homework then focuses on **PC1, Birth Year, and Birth Group**, each
+under additive, dominant, and recessive inheritance (**9 GWAS runs**).
+Students may optionally explore the full covariate menu afterward.
 
 ------------------------------------------------------------------------
 
@@ -2417,7 +2434,7 @@ configurations and additive, dominant, and recessive inheritance models.
 | Whole-genome dataset | `plink ... --autosome-num 30 ...`                 | `srd_qc_allchr.*`                                 |
 | Flexible GWAS        | `./run_gwas.sh`                                   | `.assoc.logistic` files + `gwas_run_manifest.tsv` |
 | In-class GWAS        | Covariates `1,4`; model `1`                       | Unadjusted ADD + PC1/PC2 ADD                      |
-| Homework GWAS        | Covariates `ALL`; model `ALL`                     | Presets 1-9 × ADD/DOM/REC                         |
+| Homework GWAS        | Covariates **`2,6,7`**; model **`4`**            | PC1, Birth Year, Birth Group × ADD/DOM/REC        |
 | Manhattan/Q-Q plots  | `./plot_gwas.sh`                                  | `.png` plots + `gwas_results_summary.tsv`         |
 
 ## Notes for students ✍️📖
@@ -2432,8 +2449,11 @@ configurations and additive, dominant, and recessive inheritance models.
   `+` means **covariates included together in one model**.
 - `ALL` runs the nine predefined covariate configurations separately; it
   does not generate every possible combination.
-- The classroom GWAS uses **additive only** for **Unadjusted** and
-  **PC1 + PC2**.
+- **In class:** select covariates **`1,4`** and inheritance model **`1`**
+  for **Unadjusted ADD** and **PC1 + PC2 ADD** only.
+- **Homework:** select covariates **`2,6,7`** and inheritance option **`4`**
+  for **PC1**, **Birth Year**, and **Birth Group** under **ADD, DOM, REC**.
+  Other covariates are optional, not required.
 - If you use **Geany**, it is a nice lightweight editor and easier for
   most people to navigate visually.
 - If you use **nano**, it is usually faster if you are already
