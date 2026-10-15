@@ -935,10 +935,10 @@ The script remains flexible if you wish to investigate other options.
 | Exercise | Covariate selection | Inheritance selection | Number of GWAS runs |
 |---|---|---|---:|
 | **In class** | **`1,4`** (Unadjusted; PC1 + PC2) | **`1`** (Additive only) | **2** |
-| **Homework** | **`2,6,7`** (PC1; Birth Year; Birth Group) | **`4`** (ADD, DOM, REC) | **9** |
+| **Homework** | **`2,6,7,8`** (PC1; Birth Year; Birth Group) | **`4`** (ADD, DOM, REC) | **9** |
 
 > **Use a comma, not a plus sign, for homework.** `2,6,7` runs
-> each covariate **separately**; `2+6+7` would fit them together in
+> each covariate **separately**; `2+6+7+8` would fit them together in
 > a single GWAS model. The `4` in the **inheritance** menu means
 > all three inheritance models; it does **not** select all covariates.
 
@@ -989,7 +989,7 @@ Enter selection:
 ### How the selection syntax works
 
 **For this assignment, the important covariate menu numbers are:**
-`1,4` in class, and `2,6,7` for homework. Other options in the menu
+`1,4` in class, and `2,6,7,8` for homework. Other options in the menu
 are not required for homework.
 
 The punctuation has an important meaning:
@@ -1089,7 +1089,7 @@ echo "Example: 6+5 = Birth Year + Sire."
 echo
 echo "ALL runs predefined configurations 1-9 separately."
 echo
-echo "For class: 1,4  |  For homework: 2,6,7"
+echo "For class: 1,4  |  For homework: 2,6,7,8"
 echo
 read -r -p "Enter selection: " COV_INPUT
 
