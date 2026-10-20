@@ -15,3 +15,7 @@ Use the main GWAS tutorial during the workshop:
 👉 [**GWAS Tutorial**](02_GWAS_Tutorial.md)
 
 > ⚠️ Please complete the **Before Class Setup** before attending the workshop. If you have installation problems, contact Mosope at mosope(*dot*)abanikannda(*at*)wsu(*dot*)edu before class.
+
+## 3. GSEA Tutorial Link
+
+Please click [here](https://github.com/DrBanik/Animal-Science-503-Advanced-Animal-Biology-and-Genomics-GSEA-Tutorial/blob/main/README.md) to access the GSEA Tutorial. 👉
